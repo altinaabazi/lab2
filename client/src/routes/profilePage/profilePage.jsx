@@ -5,7 +5,7 @@ import apiRequest from "../../lib/apiRequest";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { useContext, useEffect } from 'react';
-
+import { Link } from 'react-router-dom';
 function ProfilePage() {
 
   const { updateUser, currentUser } = useContext(AuthContext); 
@@ -35,7 +35,9 @@ if (!currentUser) {
         <div className="wrapper">
           <div className="title">
             <h1>User Information</h1>
-            <button>Update Profile</button>
+            <Link to="/profile/update">
+              <button>Update Profile</button>
+            </Link>
           </div>
           <div className="info">
           <span>

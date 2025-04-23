@@ -8,7 +8,7 @@ import UploadWidget from "../../components/uploadWidget/UploadWidget";
 function ProfileUpdatePage() {
   const { currentUser, updateUser } = useContext(AuthContext);
   const [error, setError] = useState("");
-  const [avatar, setAvatar] = useState(currentUser.avatar || "");
+  const [avatar, setAvatar] = useState([]);
 
   const navigate = useNavigate();
 
@@ -23,13 +23,13 @@ function ProfileUpdatePage() {
         username,
         email,
         password,
-        avatar,
+        avatar:avatar[0]
       });
       updateUser(res.data);
       navigate("/profile");
     } catch (err) {
       console.log(err);
-      setError(err.response?.data?.message || "Something went wrong.");
+      setError(err.response.data.message);
     }
   };
 
@@ -61,18 +61,14 @@ function ProfileUpdatePage() {
             <input id="password" name="password" type="password" />
           </div>
           <button>Update</button>
-          {error && <span className="error">{error}</span>}
+          {error && <span>error</span>}
         </form>
       </div>
       <div className="sideContainer">
-        <img
-          src={avatar || currentUser.avatar || "/noavatar.jpg"}
-          alt="Avatar"
-          className="avatar"
-        />
+        <img src={avatar[0] || currentUser.avatar || "/noavatar.jpg"} alt="" className="avatar" />
         <UploadWidget
           uwConfig={{
-            cloudName: "ds3nrqzv6",
+            cloudName: "lamadev",
             uploadPreset: "estate",
             multiple: false,
             maxImageFileSize: 2000000,

@@ -17,7 +17,8 @@ function SearchBar() {
   };
 
   const handleChange = (e) => {
-    setQuery((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setQuery((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -56,17 +57,14 @@ function SearchBar() {
           placeholder="Max Price"
           onChange={handleChange}
         />
-  
-        {/* 
-  <Link
-    to={`/list?type=${query.type}&city=${query.city}&minPrice=${query.minPrice}&maxPrice=${query.maxPrice}`}
-  >
-    <button>
-      <img src="/search.png" alt="" />
-    </button>
-  </Link> 
-  */}
-
+        {/* Komenti ishte i gabuar, tani është i drejtpërdrejtë */}
+        <Link
+          to={`/list?type=${query.type}&city=${query.city}&minPrice=${query.minPrice}&maxPrice=${query.maxPrice}`}
+        >
+          <button>
+            <img src="/search.png" alt="search" />
+          </button>
+        </Link>
       </form>
     </div>
   );

@@ -27,6 +27,7 @@ export const getPosts = async (req, res) => {
 
 export const getPost = async (req, res) => {
   const id = req.params.id;
+
   try {
     const post = await prisma.post.findUnique({
       where: { id },
@@ -41,30 +42,32 @@ export const getPost = async (req, res) => {
       },
     });
 
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
     const token = req.cookies?.token;
 
-    // Pjesa e komentuar që kontrollon nëse postimi është i ruajtur për përdoruesin aktual
-    /*
     if (token) {
-      jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
-        if (!err) {
-          const saved = await prisma.savedPost.findUnique({
-            where: {
-              userId_postId: {
-                postId: id,
-                userId: payload.id,
-              },
-            },
-          });
-          res.status(200).json({ ...post, isSaved: saved ? true : false });
-          return;
+      return jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
+        if (err) {
+          return res.status(200).json({ ...post, isSaved: false });
         }
+
+        const saved = await prisma.savedPost.findUnique({
+          where: {
+            userId_postId: {
+              postId: id,
+              userId: payload.id,
+            },
+          },
+        });
+
+        return res.status(200).json({ ...post, isSaved: !!saved });
       });
     }
-    */
 
-    // Kthejmë postin me "isSaved" si false përkohësisht
-    res.status(200).json({ ...post, isSaved: false });
+    return res.status(200).json({ ...post, isSaved: false });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to get post" });
@@ -85,24 +88,37 @@ export const addPost = async (req, res) => {
         },
       },
     });
+
     res.status(200).json(newPost);
   } catch (err) {
-    console.error("❌ Error creating post:", err);
-    res.status(500).json({
-      message: "Failed to create post",
-      error: err.message,
-      stack: err.stack,
-    });
+    console.log(err);
+    res.status(500).json({ message: "Failed to create post" });
   }
 };
 
 export const updatePost = async (req, res) => {
+  const id = req.params.id;
+  const tokenUserId = req.userId;
+  const body = req.body;
+
   try {
-    // Përdorni këtë për të përditësuar postimin në bazën e të dhënave
-    res.status(200).json();
+    const post = await prisma.post.findUnique({ where: { id } });
+
+    if (!post || post.userId !== tokenUserId) {
+      return res.status(403).json({ message: "Not Authorized!" });
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: {
+        ...body,
+      },
+    });
+
+    res.status(200).json(updatedPost);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to update posts" });
+    res.status(500).json({ message: "Failed to update post" });
   }
 };
 
@@ -115,7 +131,7 @@ export const deletePost = async (req, res) => {
       where: { id },
     });
 
-    if (post.userId !== tokenUserId) {
+    if (!post || post.userId !== tokenUserId) {
       return res.status(403).json({ message: "Not Authorized!" });
     }
 

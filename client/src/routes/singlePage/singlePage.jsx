@@ -17,16 +17,16 @@ function SinglePage() {
     if (!currentUser) {
       navigate("/login");
     }
-    const prevSaved = saved;
-    setSaved(!saved);
+    // AFTER REACT 19 UPDATE TO USEOPTIMISTIK HOOK
+    setSaved((prev) => !prev);
     try {
       await apiRequest.post("/users/save", { postId: post.id });
     } catch (err) {
       console.log(err);
-      setSaved(prevSaved);  // Revert back to the previous state if API request fails
+      setSaved((prev) => !prev);
     }
   };
-  
+
   return (
     <div className="singlePage">
       <div className="details">

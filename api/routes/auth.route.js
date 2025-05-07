@@ -1,5 +1,6 @@
 import express from "express";
 import { logout, register,login } from "../controllers/auth.controller.js";
+import { verifyToken, verifyAdmin } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
@@ -16,7 +17,9 @@ const router = express.Router();
 router.post("/register",register);
 router.post("/login",login);
 router.post("/logout",logout);
-
+router.get("/admin-only", verifyToken, verifyAdmin, (req, res) => {
+    res.status(200).json({ message: "Vetëm admin mund ta shohë këtë!" });
+  });
 
 
 

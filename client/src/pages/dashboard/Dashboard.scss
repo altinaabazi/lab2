@@ -1,0 +1,57 @@
+// src/pages/dashboard/dashboard.scss
+@import "../../responsive.scss";
+
+.dashboard {
+    padding: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+  
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #333;
+      text-align: center;
+    }
+  
+    .userList {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+  
+      .userCard {
+        padding: 16px;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+  
+        .left {
+          display: flex;
+          flex-direction: column;
+  
+          span.username {
+            font-weight: bold;
+            font-size: 18px;
+          }
+  
+          span.email {
+            font-size: 14px;
+            color: #777;
+          }
+        }
+  
+        .role {
+          font-size: 14px;
+          color: #555;
+          padding: 4px 8px;
+          border-radius: 8px;
+          background-color: #e0e0e0;
+        }
+      }
+    }
+  }
+  

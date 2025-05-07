@@ -12,7 +12,7 @@ function Navbar() {
   const fetch = useNotificationStore((state) => state.fetch);
   const number = useNotificationStore((state) => state.number);
 
-  if(currentUser) fetch();
+  if (currentUser) fetch();
 
   return (
     <nav>
@@ -35,6 +35,13 @@ function Navbar() {
               {number > 0 && <div className="notification">{number}</div>}
               <span>Profile</span>
             </Link>
+
+            {/* Butoni DASHBOARD për adminin */}
+            {currentUser.role === "ADMIN" && (
+              <Link to="/dashboard" className="dashboard-btn">
+                Dashboard
+              </Link>
+            )}
           </div>
         ) : (
           <>
@@ -56,8 +63,15 @@ function Navbar() {
           <a href="/">About</a>
           <a href="/">Contact</a>
           <a href="/">Agents</a>
-          <a href="/">Sign in</a>
-          <a href="/">Sign up</a>
+          {!currentUser && (
+            <>
+              <a href="/login">Sign in</a>
+              <a href="/register">Sign up</a>
+            </>
+          )}
+          {currentUser?.role === "ADMIN" && (
+            <a href="/dashboard">Dashboard</a>
+          )}
         </div>
       </div>
     </nav>

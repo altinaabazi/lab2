@@ -1,131 +1,275 @@
 .chat {
-    height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #f7f7f7, #f1f1f1); /* Ngjyrë sfondi gradient */
+
+  
+  .search {
     display: flex;
-    flex-direction: column;
-  
-    .messages {
+    padding: 12px;
+    gap: 12px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    position: relative;
+    border: 1px solid #ddd;
+
+    input {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      overflow-y: scroll;
-  
-      h1 {
-        font-weight: 300;
-      }
-  
-      .message {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        cursor: pointer;
-  
-        img {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-  
-        span {
-          font-weight: bold;
-        }
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      outline: none;
+      transition: border-color 0.3s ease;
+      background-color: #f9f9f9;
+
+      &:focus {
+        border-color: #fecd51; /* Ngjyrë e artë për fokus */
       }
     }
-    .chatBox {
-      animation: slideIn 0.3s ease-in-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
+
+    button {
+      padding: 12px 20px;
+      background-color: #fecd51;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #f7c14b;
       }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
     }
-    
-    .chatBox {
-      flex: 1;
+
+    .searchResults {
+      position: absolute;
+      top: 55px;
+      left: 0;
+      width: 100%;
       background-color: white;
+      border-radius: 8px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .searchResultItem {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-  
-      .top {
-        background-color: #f7c14b85;
-        padding: 20px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border-bottom: 1px solid #f0f0f0;
+
+      &:hover {
+        background-color: #f7f7f7;
+      }
+
+      img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      span {
         font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-  
-        .user {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-  
-          img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-          }
-        }
-        .close {
-          cursor: pointer;
-        }
-      }
-      .center {
-        height: 350px;
-        overflow: scroll;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-  
-        .chatMessage{
-          width: 50%;
-  
-          &.own{
-            align-self: flex-end;
-            text-align: right;
-          }
-  
-          span{
-            font-size: 12px;
-            background-color: #f7c14b39;
-            padding: 2px;
-            border-radius: 5px;
-          }
-        }
-      }
-      .bottom {
-        border-top: 2px solid #f7c14b85;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-  
-        textarea{
-          flex:3;
-          height: 100%;
-          border: none;
-          padding: 20px;
-        }
-  
-        button{
-          flex:1;
-          background-color: #f7c14b85;
-          height: 100%;
-          border: none;
-          cursor: pointer;
-        }
+        font-size: 15px;
+        color: #333;
       }
     }
   }
+
+  .messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 15px;
+    overflow-y: auto;
+
+    .message {
+      background-color: white;
+      padding: 18px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #f7f7f7;
+      }
+
+      img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      span {
+        font-weight: bold;
+        font-size: 15px;
+        color: #444;
+      }
+    }
+  }
+
+  .chatBox {
+    animation: slideIn 0.3s ease-in-out;
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 15px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    min-height: 500px; /* Rritur lartësia për më shumë hapësirë */
+  }
+  
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .top {
+    background-color: #f7c14b85;
+    padding: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+
+    .close {
+      cursor: pointer;
+      font-size: 18px;
+      color: #333;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #fecd51;
+      }
+    }
+  }
+
+  .center {
+    height: 350px;
+    overflow-y: scroll;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    .chatMessage {
+      width: 60%;
+      padding: 12px;
+      border-radius: 12px;
+      background-color: #f7f7f7;
+      box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.1);
+
+      &.own {
+        align-self: flex-end;
+        text-align: right;
+        background-color: #fecd51;
+        color: white;
+      }
+
+      span {
+        font-size: 13px;
+        background-color: #f7c14b39;
+        padding: 4px;
+        border-radius: 5px;
+      }
+    }
+  }
+  
+
+  .bottom {
+    border-top: 2px solid #f7c14b85;
+    height: 100px; /* Përdorim më shumë hapësirë */
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    background-color: #f7f7f7;
+
+    textarea {
+      flex: 4;
+      height: 50%; /* Shtrirje e tekstareas për më shumë hapësirë */
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      background-color: #fff;
+      box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+
+    button {
+      flex: 1;
+      background-color: #f7c14b85;
+      height: 50%;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #f7c14b;
+      }
+    }
+  }
+}
+
+.deleteChatBtn {
+  background-color: #f44336; /* Ngjyra e kuqe për paralajmërim */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.deleteChatBtn:hover {
+  background-color: #d32f2f; /* Hije më e errët kur kalon mbi butonin */
+  transform: scale(1.05); /* Shtoni efektin e zmadhohjes kur kalon mbi butonin */
+}
+
+.deleteChatBtn:active {
+  transform: scale(0.98); /* Ndjesi e shtypjes kur klikohet */
+}

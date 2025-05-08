@@ -1,4 +1,25 @@
 import prisma from "../lib/prisma.js";
+export const getUserByUsername = async (req, res) => {
+  const { username } = req.params; // Merrni emrin e përdoruesit nga parametri i URL-së
+
+  try {
+    // Gjeni përdoruesin duke përdorur emrin e përdoruesit
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Kthe përdoruesin
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error retrieving user" });
+  }
+};
+
 
 export const getChats = async (req, res) => {
     const tokenUserId = req.userId; // ID e përdoruesit të loguar
@@ -79,20 +100,53 @@ export const getChats = async (req, res) => {
     }
   };
   
+// export const addChat = async (req, res) => {
+//   const tokenUserId = req.userId;
+//   try {
+//     const newChat = await prisma.chat.create({
+//       data: {
+//         userIDs: [tokenUserId, req.body.receiverId],
+//       },
+//     });
+//     res.status(200).json(newChat);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to add chat!" });
+//   }
+// };
+
 export const addChat = async (req, res) => {
   const tokenUserId = req.userId;
+  const receiverId = req.body.receiverId;
+
   try {
-    const newChat = await prisma.chat.create({
-      data: {
-        userIDs: [tokenUserId, req.body.receiverId],
+    // Kontrolloni nëse një chat mes këtyre dy përdoruesve ekziston tashmë
+    const existingChat = await prisma.chat.findFirst({
+      where: {
+        userIDs: {
+          hasEvery: [tokenUserId, receiverId], // Kontrolloni nëse të dy përdoruesit janë pjesë e chat-it
+        },
       },
     });
-    res.status(200).json(newChat);
+
+    if (existingChat) {
+      return res.status(200).json(existingChat); // Kthe chat-in ekzistues nëse ekziston
+    }
+
+    // Nëse chat-i nuk ekziston, krijo një të ri
+    const newChat = await prisma.chat.create({
+      data: {
+        userIDs: [tokenUserId, receiverId],
+      },
+    });
+
+    res.status(200).json(newChat); // Kthe chat-in e ri
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to add chat!" });
   }
 };
+
 
 export const readChat = async (req, res) => {
   const tokenUserId = req.userId;
@@ -116,5 +170,44 @@ export const readChat = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to read chat!" });
+  }
+};
+export const deleteChat = async (req, res) => {
+  const tokenUserId = req.userId;
+  const chatId = req.params.id;
+
+  try {
+    // Verifikoni nëse përdoruesi është pjesë e këtij chati
+    const chat = await prisma.chat.findUnique({
+      where: {
+        id: chatId,
+      },
+      include: {
+        messages: true, // Përfshi mesazhet që janë pjesë e chat-it
+      },
+    });
+
+    if (!chat || !chat.userIDs.includes(tokenUserId)) {
+      return res.status(403).json({ message: "Not authorized to delete this chat" });
+    }
+
+    // Fshi mesazhet e lidhura me chat-in
+    await prisma.message.deleteMany({
+      where: {
+        chatId: chatId,
+      },
+    });
+
+    // Fshi chat-in
+    await prisma.chat.delete({
+      where: {
+        id: chatId,
+      },
+    });
+
+    res.status(200).json({ message: "Chat and messages deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting chat and messages:", err);
+    res.status(500).json({ message: "Failed to delete chat" });
   }
 };

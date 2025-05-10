@@ -11,20 +11,21 @@ import ProfileUpdatePage from "./routes/profileUpdatePage/profileUpdatePage";
 import NewPostPage from "./routes/newPostPage/newPostPage";
 import { profilePageLoader, singlePageLoader, listPageLoader } from "./lib/loaders";
 import Dashboard from "./pages/dashboard/Dashboard";
+
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <Layout />, // E kemi Layout si një komponent që do të mbështesë të gjitha faqet
       children: [
         {
           path: "/",
-          element: <HomePage />,
+          element: <HomePage />, // Kjo është faqe kryesore
         },
         {
           path: "/list",
           element: <ListPage />,
-          loader: listPageLoader,
+          loader: listPageLoader, // Për ngarkimin e të dhënave
         },
         {
           path: "/:id",
@@ -33,17 +34,17 @@ function App() {
         },
         {
           path: "/login",
-          element: <Login />,
+          element: <Login />, // Faqja e logimit
         },
         {
           path: "/register",
-          element: <Register />,
+          element: <Register />, // Faqja e regjistrimit
         },
       ],
     },
     {
       path: "/",
-      element: <RequireAuth />,
+      element: <RequireAuth />, // Ky do të jetë një auth middleware që do të kontrollojë sesionin e përdoruesit
       children: [
         {
           path: "/profile",
@@ -52,7 +53,7 @@ function App() {
         },
         {
           path: "/dashboard",
-          element: <Dashboard />,
+          element: <Dashboard />, // Dashboard për përdoruesit administrues
         },
         {
           path: "/profile/update",
@@ -60,7 +61,7 @@ function App() {
         },
         {
           path: "/add",
-          element: <NewPostPage />,
+          element: <NewPostPage />, // Faqja për shtimin e postimeve
         },
       ],
     },

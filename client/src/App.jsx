@@ -11,7 +11,9 @@ import ProfileUpdatePage from "./routes/profileUpdatePage/profileUpdatePage";
 import NewPostPage from "./routes/newPostPage/newPostPage";
 import { profilePageLoader, singlePageLoader, listPageLoader } from "./lib/loaders";
 import Dashboard from "./pages/dashboard/Dashboard";
-
+import About from "./pages/about/About";
+import Footer from "./pages/footer/Footer";
+import Contact from "./pages/contact/Contact";
 function App() {
   const router = createBrowserRouter([
     {
@@ -22,6 +24,19 @@ function App() {
           path: "/",
           element: <HomePage />, // Kjo është faqe kryesore
         },
+         {
+      path: "/about",
+      element: <About />,
+    },
+     {
+      path: "/contact",
+      element: <Contact />,
+    },
+     {
+      path: "/footer",
+      element: <Footer />,
+    },
+
         {
           path: "/list",
           element: <ListPage />,

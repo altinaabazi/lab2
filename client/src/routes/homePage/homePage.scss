@@ -1,83 +1,102 @@
-@import "../../responsive.scss";
-
 .homePage {
   display: flex;
-  height: 100%;
+  flex-direction: column;
+  min-height: 100vh;
 
+  /* Hero Section */
+  .hero {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px;
+
+    @media (max-width: 900px) { 
+      flex-direction: column; /* Për ekranet më të vogla, njëri mbi tjetrin */
+    }
+  }
+
+  /* Text Container */
   .textContainer {
-    flex: 3;
+    flex: 1;
+    padding-right: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
 
-    .wrapper {
-      padding-right: 100px;
+    @media (max-width: 600px) {
+      padding-right: 20px; /* Përshtatet më mirë për ekranet më të vogla */
+    }
+
+    .title {
+      font-size: 64px;
+
+      @media (max-width: 1200px) {
+        font-size: 48px;
+      }
+    }
+
+    .boxes {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 50px;
-      height: 100%;
+      justify-content: space-between;
 
-      @include lg{
-        padding-right: 50px;
+      @media (max-width: 600px) {
+        display: none; /* Fsheh kutitë në ekranet më të vogla */
       }
 
-      @include md{
-        padding: 0;
-      }
+      h1 {
+        font-size: 36px;
 
-      @include sm{
-        justify-content: flex-start;
-      }
-
-      .title {
-        font-size: 64px;
-
-        @include lg {
-          font-size: 48px;
+        @media (max-width: 1200px) {
+          font-size: 32px;
         }
       }
 
-      .boxes {
-        display: flex;
-        justify-content: space-between;
-
-        @include sm {
-          display: none;
-        }
-
-        h1 {
-          font-size: 36px;
-
-          @include lg {
-            font-size: 32px;
-          }
-        }
-
-        h2 {
-          font-size: 20px;
-          font-weight: 300;
-        }
+      h2 {
+        font-size: 20px;
+        font-weight: 300;
       }
     }
   }
 
+  /* Image Container */
   .imgContainer {
-    flex: 2;
+    flex: 1;
     background-color: #fcf5f3;
     position: relative;
     display: flex;
+    justify-content: center;
     align-items: center;
-
-    @include md {
-      display: none;
-    }
+    padding: 20px;
 
     img {
-      width: 115%;
-      position: absolute;
-      right: 0;
-
-      @include lg {
-        width: 105%;
-      }
+      max-width: 100%;
+      height: auto;
     }
+
+    @media (max-width: 900px) {
+      display: none; /* Nuk shfaqet imazhi në ekranet më të vogla */
+    }
+  }
+
+  /* Sekcionet e tjera */
+  .aboutSection, .contactSection, .footerSection {
+    padding: 50px 0;
+    background-color: #f8f8f8;
+    text-align: center; /* Përshtat përmbajtjen në qendër */
+  }
+
+  .aboutSection {
+    margin-top: 100px;
+  }
+
+  .contactSection {
+    margin-top: 50px;
+  }
+
+  .footerSection {
+    margin-top: 50px;
   }
 }

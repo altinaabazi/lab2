@@ -29,9 +29,14 @@ export const updateUser = async (req, res) => {
   const tokenUserId = req.userId;
   const { password, avatar, ...inputs } = req.body;
 
-  if (id !== tokenUserId) {
-    return res.status(403).json({ message: "Not Authorized!" });
-  }
+ const requestingUser = await prisma.user.findUnique({
+  where: { id: tokenUserId },
+});
+
+if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
+  return res.status(403).json({ message: "Not Authorized!" });
+}
+
 
   let updatedPassword = null;
   try {
@@ -57,22 +62,45 @@ export const updateUser = async (req, res) => {
   }
 };
 
+// export const deleteUser = async (req, res) => {
+//   const id = req.params.id;
+//   const tokenUserId = req.userId;
+
+//   if (id !== tokenUserId) {
+//     return res.status(403).json({ message: "Not Authorized!" });
+//   }
+
+//   try {
+//     await prisma.user.delete({
+//       where: { id },
+//     });
+//     res.status(200).json({ message: "User deleted" });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to delete users!" });
+//   }
+// };
 export const deleteUser = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
 
-  if (id !== tokenUserId) {
-    return res.status(403).json({ message: "Not Authorized!" });
-  }
-
   try {
+    const requestingUser = await prisma.user.findUnique({
+      where: { id: tokenUserId },
+    });
+
+    if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
+      return res.status(403).json({ message: "Not Authorized!" });
+    }
+
     await prisma.user.delete({
       where: { id },
     });
+
     res.status(200).json({ message: "User deleted" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to delete users!" });
+    res.status(500).json({ message: "Failed to delete user!" });
   }
 };
 

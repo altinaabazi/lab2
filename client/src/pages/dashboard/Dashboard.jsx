@@ -2,6 +2,11 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Doughnut, Line, Bar } from "react-chartjs-2";
+import { AuthContext } from "../../context/AuthContext";
+import Modal from "../../components/modal/Modal";
+import "./Dashboard.scss";
+
+// Importo komponentet e nevojshme nga Chart.js
 import {
   Chart as ChartJS,
   ArcElement,
@@ -14,9 +19,8 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { AuthContext } from "../../context/AuthContext";
-import "./Dashboard.scss";
 
+// Regjistro komponentet që do përdorim
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -33,6 +37,10 @@ function Dashboard() {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({ username: "", email: "", password: "", role: "USER" });
+  const [editingUser, setEditingUser] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "ADMIN") {
@@ -40,19 +48,75 @@ function Dashboard() {
       return;
     }
 
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get("http://localhost:8800/api/users", {
-          withCredentials: true,
-        });
-        setUsers(res.data);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      }
-    };
-
     fetchUsers();
   }, [currentUser, navigate]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/api/users", {
+        withCredentials: true,
+      });
+      setUsers(res.data);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    }
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:8800/api/auth/register", newUser, {
+        withCredentials: true,
+      });
+      setNewUser({ username: "", email: "", password: "", role: "USER" });
+      fetchUsers();
+      setIsAddModalOpen(false);  // Close the modal
+    } catch (err) {
+      console.error("Failed to add user:", err);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("A je i sigurt që dëshiron të fshish këtë përdorues?")) return;
+
+    try {
+      await axios.delete(`http://localhost:8800/api/users/${id}`, {
+        withCredentials: true,
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingUser((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8800/api/users/${editingUser.id}`,
+        {
+          username: editingUser.username,
+          email: editingUser.email,
+          role: editingUser.role,
+        },
+        { withCredentials: true }
+      );
+      setEditingUser(null);
+      fetchUsers();
+      setIsEditModalOpen(false);  // Close the modal after saving
+    } catch (err) {
+      console.error("Failed to update user:", err);
+    }
+  };
 
   const roleCounts = users.reduce((acc, user) => {
     acc[user.role] = (acc[user.role] || 0) + 1;
@@ -144,6 +208,10 @@ function Dashboard() {
         </div>
       </div>
 
+      <div className="top-bar">
+        <button className="btn-add" onClick={() => setIsAddModalOpen(true)}>Shto</button>
+      </div>
+
       <h2>Lista e përdoruesve</h2>
       <table className="user-table">
         <thead>
@@ -152,6 +220,7 @@ function Dashboard() {
             <th>Emri</th>
             <th>Email</th>
             <th>Roli</th>
+            <th>Veprime</th>
           </tr>
         </thead>
         <tbody>
@@ -161,10 +230,81 @@ function Dashboard() {
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
+
+              <td>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="btn-edit" onClick={() => handleEditClick(user)}>Edito</button>
+                  <button className="btn-delete" onClick={() => handleDeleteUser(user.id)}>Fshij</button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Add User Modal */}
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSubmit={handleAddUser}>
+        <h2>Shto përdorues të ri</h2>
+        <form onSubmit={handleAddUser} className="add-user-form">
+          <input
+            type="text"
+            placeholder="Emri"
+            value={newUser.username}
+            onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Fjalëkalimi"
+            value={newUser.password}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            required
+          />
+          <select
+            value={newUser.role}
+            onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+          >
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </form>
+      </Modal>
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <Modal isOpen={isEditModalOpen} onClose={() => setEditingUser(null)} onSubmit={handleSaveEdit}>
+          <h3>Edito Përdoruesin</h3>
+          <form onSubmit={handleSaveEdit} className="add-user-form">
+            <input
+              name="username"
+              type="text"
+              value={editingUser.username}
+              onChange={handleEditChange}
+              required
+            />
+            <input
+              name="email"
+              type="email"
+              value={editingUser.email}
+              onChange={handleEditChange}
+              required
+            />
+            <select name="role" value={editingUser.role} onChange={handleEditChange} required>
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+
+          </form>
+        </Modal>
+      )}
+
     </div>
   );
 }

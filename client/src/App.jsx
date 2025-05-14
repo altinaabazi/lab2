@@ -14,6 +14,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import About from "./pages/about/About";
 import Footer from "./pages/footer/Footer";
 import Contact from "./pages/contact/Contact";
+import Chat from "./components/chat/chat";
 function App() {
   const router = createBrowserRouter([
     {
@@ -24,19 +25,18 @@ function App() {
           path: "/",
           element: <HomePage />, // Kjo është faqe kryesore
         },
-         {
-      path: "/about",
-      element: <About />,
-    },
-     {
-      path: "/contact",
-      element: <Contact />,
-    },
-     {
-      path: "/footer",
-      element: <Footer />,
-    },
-
+        {
+          path: "/about",
+          element: <About />,
+        },
+        {
+          path: "/contact",
+          element: <Contact />,
+        },
+        {
+          path: "/footer",
+          element: <Footer />,
+        },
         {
           path: "/list",
           element: <ListPage />,
@@ -54,6 +54,11 @@ function App() {
         {
           path: "/register",
           element: <Register />, // Faqja e regjistrimit
+        },
+        {
+        path:"/chat/:id",
+
+          element: <Chat />, // Chat component
         },
       ],
     },

@@ -3,15 +3,16 @@ import List from "../../components/list/List";
 import "./profilePage.scss";
 import apiRequest from "../../lib/apiRequest";
 import { Await, Link, useLoaderData, useNavigate } from "react-router-dom";
-import { Suspense, useContext } from "react";
+import { Suspense, useContext , useState} from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 function ProfilePage() {
   const data = useLoaderData();
-
   const { updateUser, currentUser } = useContext(AuthContext);
-
   const navigate = useNavigate();
+
+  const [showMyList, setShowMyList] = useState(false);
+  const [showSavedList, setShowSavedList] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -22,6 +23,15 @@ function ProfilePage() {
       console.log(err);
     }
   };
+
+  const toggleMyList = () => {
+    setShowMyList(prev => !prev);
+  };
+
+  const toggleSavedList = () => {
+    setShowSavedList(prev => !prev);
+  };
+
   return (
     <div className="profilePage">
       <div className="details">
@@ -34,8 +44,7 @@ function ProfilePage() {
           </div>
           <div className="info">
             <span>
-              Avatar:
-              <img src={currentUser.avatar || "noavatar.jpg"} alt="" />
+              <img src={currentUser.avatar || "noavatar.jpg"} alt="User Avatar" />
             </span>
             <span>
               Username: <b>{currentUser.username}</b>
@@ -45,33 +54,46 @@ function ProfilePage() {
             </span>
             <button onClick={handleLogout}>Logout</button>
           </div>
+
+          {/* My List Section */}
           <div className="title">
             <h1>My List</h1>
-            <Link to="/add">
-              <button>Create New Post</button>
-            </Link>
+            <button onClick={toggleMyList}>
+              {showMyList ? 'Hide My List' : 'Show My List'}
+            </button>
           </div>
-          <Suspense fallback={<p>Loading...</p>}>
-            <Await
-              resolve={data.postResponse}
-              errorElement={<p>Error loading posts!</p>}
-            >
-              {(postResponse) => <List posts={postResponse.data.userPosts} />}
-            </Await>
-          </Suspense>
+          {showMyList && (
+            <Suspense fallback={<p>Loading...</p>}>
+              <Await
+                resolve={data.postResponse}
+                errorElement={<p>Error loading posts!</p>}
+              >
+                {(postResponse) => <List posts={postResponse.data.userPosts} />}
+              </Await>
+            </Suspense>
+          )}
+
+          {/* Saved List Section */}
           <div className="title">
             <h1>Saved List</h1>
+            <button onClick={toggleSavedList}>
+              {showSavedList ? 'Hide Saved List' : 'Show Saved List'}
+            </button>
           </div>
-          <Suspense fallback={<p>Loading...</p>}>
-            <Await
-              resolve={data.postResponse}
-              errorElement={<p>Error loading posts!</p>}
-            >
-              {(postResponse) => <List posts={postResponse.data.savedPosts} />}
-            </Await>
-          </Suspense>
+          {showSavedList && (
+            <Suspense fallback={<p>Loading...</p>}>
+              <Await
+                resolve={data.postResponse}
+                errorElement={<p>Error loading posts!</p>}
+              >
+                {(postResponse) => <List posts={postResponse.data.savedPosts} />}
+              </Await>
+            </Suspense>
+          )}
         </div>
       </div>
+
+      {/* Chat Section */}
       <div className="chatContainer">
         <div className="wrapper">
           <Suspense fallback={<p>Loading...</p>}>
@@ -79,7 +101,7 @@ function ProfilePage() {
               resolve={data.chatResponse}
               errorElement={<p>Error loading chats!</p>}
             >
-              {(chatResponse) => <Chat chats={chatResponse.data}/>}
+              {(chatResponse) => <Chat chats={chatResponse.data} />}
             </Await>
           </Suspense>
         </div>

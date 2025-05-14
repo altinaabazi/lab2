@@ -4,85 +4,141 @@
   display: flex;
   height: 100%;
 
-  @include md{
+  @include md {
     flex-direction: column;
     overflow: scroll;
   }
 
   .details {
     flex: 3;
-    overflow-y: scroll;
+    overflow-y: auto;
+    max-height: calc(100vh - 40px);
     padding-bottom: 50px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1300px;
+    padding: 30px;
 
-    @include md{
-      flex:none;
-      height: max-content;
+    // Custom scroll
+    &::-webkit-scrollbar {
+      width: 8px;
     }
 
-    .wrapper{
-      padding-right: 50px;
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+
+    @include md {
+      flex: none;
+      height: auto;
+      width: 100%;
+      max-height: none;
+      padding: 20px;
+    }
+
+    .wrapper {
       display: flex;
       flex-direction: column;
       gap: 50px;
+      align-items: center; // për të qendruar gjithçka në qendër
 
-      .title{
+      .title {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        width: 100%;
 
-        h1{
+        h1 {
           font-weight: 300;
+          font-size: 24px;
+          color: #1e3a8a; // kaltër i errët
         }
 
-        button{
+        button {
           padding: 12px 24px;
-          background-color: #fece51;
+          background-color: #3b82f6; // kaltër
+          color: #ffffff;
+          border-radius: 8px;
+          font-weight: 500;
           cursor: pointer;
           border: none;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #2563eb;
+          }
         }
       }
 
-      .info{
+      .info {
+        background-color: #f0f8ff; // blu shumë e lehtë
+        border-radius: 16px;
+        padding: 30px;
+        width: 100%;
+        max-width: 600px;
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-        span{
+        span {
           display: flex;
           align-items: center;
           gap: 20px;
+          font-size: 16px;
+          color: #1e3a8a;
         }
 
-        button{
-          width: 100px;
-          background-color: teal;
+        button {
+          background-color: #1d4ed8;
           border: none;
           color: white;
-          padding: 10px 20px;
+          padding: 10px 24px;
           cursor: pointer;
-          border-radius: 5px;
+          border-radius: 10px;
+          font-weight: 500;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #1e40af;
+          }
         }
 
-        img{
-          width: 40px;
-          height: 40px;
+        img {
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           object-fit: cover;
+          border: 3px solid #3b82f6;
         }
       }
     }
   }
+
   .chatContainer {
     flex: 2;
     background-color: #fcf5f3;
     height: 100%;
 
-    @include md{
-      flex:none;
+    @include md {
+      flex: none;
       height: max-content;
     }
 
-    .wrapper{
+    .wrapper {
       padding: 0px 20px;
       height: 100%;
     }

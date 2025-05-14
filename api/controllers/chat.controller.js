@@ -115,39 +115,46 @@ export const getChats = async (req, res) => {
 //   }
 // };
 
+// Funksioni për krijimin e një chat-i të ri
 export const addChat = async (req, res) => {
-  const tokenUserId = req.userId;
-  const receiverId = req.body.receiverId;
+  const tokenUserId = req.userId;  // ID e përdoruesit të loguar
+  const receiverId = req.body.receiverId;  // ID e përdoruesit tjetër (për të cilin po krijohet chat-i)
+
+  // Kontrollo nëse të dhënat janë të plota
+  if (!tokenUserId || !receiverId) {
+    return res.status(400).json({ message: "Missing user ID or receiver ID" });
+  }
 
   try {
-    // Kontrolloni nëse një chat mes këtyre dy përdoruesve ekziston tashmë
+    // Kontrollo nëse ekziston një chat mes këtyre dy përdoruesve
     const existingChat = await prisma.chat.findFirst({
       where: {
         userIDs: {
-          hasEvery: [tokenUserId, receiverId], // Kontrolloni nëse të dy përdoruesit janë pjesë e chat-it
+          hasEvery: [tokenUserId, receiverId], // Kontrollo nëse të dy përdoruesit janë pjesë e chat-it
         },
       },
     });
 
+    // Nëse ekziston një chat, kthe atë
     if (existingChat) {
-      return res.status(200).json(existingChat); // Kthe chat-in ekzistues nëse ekziston
+      return res.status(200).json(existingChat); // Kthe chat-in ekzistues
     }
 
-    // Nëse chat-i nuk ekziston, krijo një të ri
+    // Krijo një chat të ri nëse nuk ekziston
     const newChat = await prisma.chat.create({
       data: {
-        userIDs: [tokenUserId, receiverId],
+        userIDs: [tokenUserId, receiverId], // Shto përdoruesit në chat
       },
     });
 
-    res.status(200).json(newChat); // Kthe chat-in e ri
+    // Kthe chat-in e ri
+    return res.status(200).json(newChat);
+
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Failed to add chat!" });
+    console.error("Error creating chat:", err.message, err.stack);  // Logim i detajuar i gabimit
+    return res.status(500).json({ message: "Failed to add chat!" });
   }
 };
-
-
 export const readChat = async (req, res) => {
   const tokenUserId = req.userId;
 

@@ -15,41 +15,41 @@ function HomePage() {
       <section className="hero">
         <div className="textContainer">
           <div className="wrapper">
-            <h1 className="title">Find Real Estate & Get Your Dream Place</h1>
+            <h1 className="title">Discover Your Perfect Place with PlacePoint</h1>
             <SearchBar />
             <div className="boxes">
               <div className="box">
                 <h1>16+</h1>
-                <h2>Years of Experience</h2>
+                <h2>Years of Expertise</h2>
               </div>
               <div className="box">
                 <h1>200</h1>
-                <h2>Award Gained</h2>
+                <h2>Awards Achieved</h2>
               </div>
               <div className="box">
                 <h1>2000+</h1>
-                <h2>Property Ready</h2>
+                <h2>Properties Available</h2>
               </div>
             </div>
           </div>
         </div>
         <div className="imgContainer">
-          <img src="/bg.png" alt="" />
+        <img src="placepoint.jpg" alt="PlacePoint Background" />
+
         </div>
       </section>
-<section id="about" className="aboutSection">
-  <About />
-</section>
 
+      <section id="about" className="aboutSection">
+        <About />
+      </section>
 
-  <section  id="contact" className="contactSection">
-    <Contact />
-  </section>
+      <section id="contact" className="contactSection">
+        <Contact />
+      </section>
 
-  <footer className="footerSection">
-    <Footer />
-  </footer>
-     
+      <footer className="footerSection">
+        <Footer />
+      </footer>
     </div>
   );
 }

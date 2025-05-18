@@ -27,11 +27,11 @@ function Navbar() {
         <a href="/">Home</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        {currentUser.role === "ADMIN" && (
-              <Link to="/dashboard">
-                Dashboard
-              </Link>
-            )}
+        {currentUser?.role === "ADMIN" ? (
+          <Link to="/dashboard">Dashboard</Link>
+        ) : (
+          <a href="/">Agents</a>
+        )}
       </div>
 
       <div className="right">
@@ -40,7 +40,6 @@ function Navbar() {
             <img src={currentUser.avatar || "/noavatar.jpg"} alt="avatar" />
             <span>{currentUser.username}</span>
             {number > 0 && <div className="notification">{number}</div>}
-
           </div>
         ) : (
           <>
@@ -63,8 +62,10 @@ function Navbar() {
           <a href="/">Home</a>
           <a href="/">About</a>
           <a href="/">Contact</a>
-           {currentUser?.role === "ADMIN" && (
+          {currentUser?.role === "ADMIN" ? (
             <a href="/dashboard">Dashboard</a>
+          ) : (
+            <a href="/">Agents</a>
           )}
           {!currentUser && (
             <>
@@ -72,7 +73,6 @@ function Navbar() {
               <a href="/register">Sign up</a>
             </>
           )}
-         
         </div>
       </div>
     </nav>

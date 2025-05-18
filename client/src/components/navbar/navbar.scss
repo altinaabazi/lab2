@@ -1,10 +1,5 @@
 @import "../../responsive.scss";
 
-$primary-color: #007BFF; // Kaltër e ndritshme
-$secondary-color: #ffffff; // Bardh
-$hover-color: #0056b3; // Kaltër më e errët për hover
-$text-color: #333;
-
 nav {
   height: 60px;
   display: flex;
@@ -13,12 +8,8 @@ nav {
   max-width: 1300px;
   margin: 0 auto;
   padding: 0 20px;
-  background-color: $secondary-color;
-  color: $text-color;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   a {
-    color: $text-color;
     transition: all 0.4s ease;
 
     @include sm {
@@ -27,21 +18,16 @@ nav {
 
     &:hover {
       scale: 1.05;
-      color: $primary-color;
     }
   }
 
   .dashboard-btn {
     margin-left: 10px;
     padding: 6px 12px;
-    background-color: $primary-color;
-    color: $secondary-color;
+    background-color: #333;
+    color: white;
     border-radius: 5px;
     text-decoration: none;
-
-    &:hover {
-      background-color: $hover-color;
-    }
   }
 
   .left {
@@ -56,7 +42,6 @@ nav {
       display: flex;
       align-items: center;
       gap: 10px;
-      color: $primary-color;
 
       img {
         width: 28px;
@@ -80,6 +65,7 @@ nav {
     align-items: center;
     justify-content: flex-end;
     background-color: transparent;
+    height: auto;
     gap: 10px;
     padding-right: 20px;
 
@@ -90,21 +76,12 @@ nav {
     a {
       padding: 12px 24px;
       margin: 0 10px;
-      background-color: transparent;
-      border: 2px solid transparent;
-      border-radius: 5px;
-
-      &:hover {
-        border-color: $primary-color;
-        color: $primary-color;
-      }
     }
 
     .user {
       display: flex;
       align-items: center;
       font-weight: bold;
-      color: $text-color;
 
       img {
         width: 40px;
@@ -124,16 +101,11 @@ nav {
 
       .profile {
         padding: 12px 24px;
-        background-color: $primary-color;
+        background-color: #fece51;
         cursor: pointer;
         border: none;
         position: relative;
         border-radius: 5px;
-        color: $secondary-color;
-
-        &:hover {
-          background-color: $hover-color;
-        }
 
         .notification {
           position: absolute;
@@ -153,13 +125,8 @@ nav {
     }
 
     .register {
-      background-color: $primary-color;
+      background-color: #fece51;
       border-radius: 5px;
-      color: $secondary-color;
-
-      &:hover {
-        background-color: $hover-color;
-      }
     }
 
     .menuIcon {
@@ -176,32 +143,32 @@ nav {
         display: inline;
       }
     }
+    .notification {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: red;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
     .user {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease, padding 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05);
-    background-color: #f0f0f0;
-  }
-
-  &.active {
-    background-color: #d1e7ff;  // Kaltër i lehtë për ta bërë të dallueshëm
-    padding: 10px;  // Pak rritje e padding për efekt klikimi
-    border-radius: 5px;  // E shton një shkëlqim të vogël
-  }
-}
-
+      position: relative;
+    }
 
     .menu {
       position: absolute;
       top: 0;
       right: -50%;
-      background-color: $primary-color;
-      color: $secondary-color;
+      background-color: black;
+      color: white;
       height: 100vh;
       width: 50%;
       transition: all 1s ease;
@@ -219,7 +186,6 @@ nav {
       @include sm {
         a {
           display: initial;
-          color: $secondary-color;
         }
       }
     }

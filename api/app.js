@@ -8,6 +8,8 @@ import testRoute from "./routes/test.route.js";
 import userRoute from "./routes/user.route.js";
 import chatRoute from "./routes/chat.route.js";
 import messageRoute from "./routes/message.route.js";
+import contactRoute from "./routes/contact.route.js";
+
 
 
 // Ngarkojmë variablat nga skedari .env
@@ -36,6 +38,8 @@ app.use("/api/users", userRoute);
 app.use("/api/test", testRoute);
 app.use("/api/chats", chatRoute);
 app.use("/api/messages", messageRoute);
+app.use("/api/contact", contactRoute);
+
 
 
 // Dëgjojmë për kërkesa në portin 8800

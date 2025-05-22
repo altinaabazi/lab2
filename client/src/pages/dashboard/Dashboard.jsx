@@ -20,6 +20,7 @@ import {
   Title,
 } from "chart.js";
 
+
 // Regjistro komponentet që do përdorim
 ChartJS.register(
   ArcElement,
@@ -41,6 +42,24 @@ function Dashboard() {
   const [editingUser, setEditingUser] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+
+const fetchMessages = async () => {
+  try {
+    const res = await axios.get("http://localhost:8800/api/contact", {
+      withCredentials: true,
+    });
+    setMessages(res.data);
+  } catch (err) {
+    console.error("Gabim gjatë marrjes së mesazheve:", err);
+  }
+};
+
+useEffect(() => {
+  if (currentUser?.role === "ADMIN") {
+    fetchMessages();
+  }
+}, [currentUser]);
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "ADMIN") {
@@ -241,6 +260,33 @@ function Dashboard() {
           ))}
         </tbody>
       </table>
+
+      <h2>Contact Form</h2>
+<table className="user-table">
+  <thead>
+    <tr>
+      <th>Emri</th>
+      <th>Mbiemri</th>
+      <th>Email</th>
+      <th>Telefoni</th>
+      <th>Mesazhi</th>
+      <th>Data</th>
+    </tr>
+  </thead>
+  <tbody>
+    {messages.map((msg, index) => (
+      <tr key={index}>
+        <td>{msg.name}</td>
+        <td>{msg.lastname}</td>
+        <td>{msg.email}</td>
+        <td>{msg.phone}</td>
+        <td>{msg.message}</td>
+        <td>{new Date(msg.date).toLocaleString()}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 
       {/* Add User Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSubmit={handleAddUser}>

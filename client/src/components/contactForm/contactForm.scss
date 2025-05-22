@@ -1,0 +1,67 @@
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 20px auto 0;
+  padding: 0 20px;
+
+  input,
+  textarea {
+    font-size: 1rem;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #0070f3;
+      box-shadow: 0 0 5px rgba(0, 112, 243, 0.5);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  button {
+    background-color: #0070f3;
+    color: white;
+    font-weight: 600;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #005bb5;
+    }
+  }
+
+  p {
+    margin-top: 10px;
+    color: #333;
+    font-style: italic;
+  }
+
+  // Emri + Mbiemri në një rresht
+  .nameRow {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 15px;
+
+    input {
+      flex: 1;
+    }
+  }
+
+  // Responsive për telefon
+  @media (max-width: 500px) {
+    .nameRow {
+      flex-direction: column;
+    }
+  }
+}

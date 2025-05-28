@@ -9,8 +9,7 @@ import userRoute from "./routes/user.route.js";
 import chatRoute from "./routes/chat.route.js";
 import messageRoute from "./routes/message.route.js";
 import contactRoute from "./routes/contact.route.js";
-
-
+import orderRoute from "./routes/order.route.js"; // Importojmë order.route.js
 
 // Ngarkojmë variablat nga skedari .env
 dotenv.config();
@@ -23,7 +22,7 @@ const corsOptions = {
   credentials: true, // Lejon përdorimin e cookies
 };
 
-app.use(cors(corsOptions)); // Aplikoni CORS me këto mundësi
+app.use(cors(corsOptions)); // Aplikojmë CORS me këto mundësi
 
 app.use(express.json());
 app.use(cookieParser());
@@ -39,8 +38,7 @@ app.use("/api/test", testRoute);
 app.use("/api/chats", chatRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/contact", contactRoute);
-
-
+app.use("/api/orders", orderRoute);  // Shtojmë rrugën për porositë
 
 // Dëgjojmë për kërkesa në portin 8800
 app.listen(8800, () => {

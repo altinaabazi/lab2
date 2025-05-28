@@ -20,7 +20,6 @@ import {
   Title,
 } from "chart.js";
 
-
 // Regjistro komponentet që do përdorim
 ChartJS.register(
   ArcElement,
@@ -43,24 +42,47 @@ function Dashboard() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [messages, setMessages] = useState([]);
+const [editingOrder, setEditingOrder] = useState(null);
+const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
+const [showUsers, setShowUsers] = useState(false);
+const [showMessages, setShowMessages] = useState(false);
+const [showOrders, setShowOrders] = useState(false);
 
-const fetchMessages = async () => {
-  try {
-    const res = await axios.get("http://localhost:8800/api/contact", {
-      withCredentials: true,
-    });
-    setMessages(res.data);
-  } catch (err) {
-    console.error("Gabim gjatë marrjes së mesazheve:", err);
-  }
-};
+  // Shtesë: orders
+  const [orders, setOrders] = useState([]);
 
-useEffect(() => {
-  if (currentUser?.role === "ADMIN") {
-    fetchMessages();
-  }
-}, [currentUser]);
+  // Funksioni për marrjen e mesazheve
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/api/contact", {
+        withCredentials: true,
+      });
+      setMessages(res.data);
+    } catch (err) {
+      console.error("Gabim gjatë marrjes së mesazheve:", err);
+    }
+  };
 
+const fetchOrders = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/api/orders", {
+        withCredentials: true,
+      });
+      setOrders(res.data);
+    } catch (err) {
+      console.error("Gabim gjatë marrjes së porosive:", err);
+    }
+  };
+
+  // UseEffect për mesazhet dhe porositë vetëm nëse është ADMIN
+  useEffect(() => {
+    if (currentUser?.role === "ADMIN") {
+      fetchMessages();
+      fetchOrders();
+    }
+  }, [currentUser]);
+
+  // UseEffect për kontrollin e rolit dhe marrjen e përdoruesve
   useEffect(() => {
     if (!currentUser || currentUser.role !== "ADMIN") {
       navigate("/");
@@ -70,6 +92,7 @@ useEffect(() => {
     fetchUsers();
   }, [currentUser, navigate]);
 
+  // Funksioni për marrjen e përdoruesve
   const fetchUsers = async () => {
     try {
       const res = await axios.get("http://localhost:8800/api/users", {
@@ -81,6 +104,7 @@ useEffect(() => {
     }
   };
 
+  // Funksionet për shtimin, fshirjen dhe editimin e përdoruesve
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
@@ -89,7 +113,7 @@ useEffect(() => {
       });
       setNewUser({ username: "", email: "", password: "", role: "USER" });
       fetchUsers();
-      setIsAddModalOpen(false);  // Close the modal
+      setIsAddModalOpen(false);
     } catch (err) {
       console.error("Failed to add user:", err);
     }
@@ -131,17 +155,63 @@ useEffect(() => {
       );
       setEditingUser(null);
       fetchUsers();
-      setIsEditModalOpen(false);  // Close the modal after saving
+      setIsEditModalOpen(false);
     } catch (err) {
       console.error("Failed to update user:", err);
     }
   };
+const handleDeleteOrder = async (id) => {
+  if (!window.confirm("A je i sigurt që dëshiron të fshish këtë porosi?")) return;
 
+  try {
+    await axios.delete(`http://localhost:8800/api/orders/${id}`, { withCredentials: true });
+    fetchOrders();  // rifreskon listën e porosive
+  } catch (err) {
+    console.error("Failed to delete order:", err);
+  }
+};
+
+const handleEditOrder = (order) => {
+  setEditingOrder(order);
+  setIsEditOrderModalOpen(true);
+};
+
+const handleOrderChange = (e) => {
+  const { name, value } = e.target;
+  setEditingOrder(prev => ({
+    ...prev,
+    [name]: value,   // Kjo rresht mungon dhe duhet shtuar
+  }));
+};
+
+
+const handleSaveOrderEdit = async (e) => {
+  e.preventDefault();
+
+  try {
+    await axios.put(
+      `http://localhost:8800/api/orders/${editingOrder.id}`,
+      {
+        status: editingOrder.status,
+        orderDate: editingOrder.orderDate,
+      },
+      { withCredentials: true }
+    );
+    setEditingOrder(null);
+    setIsEditOrderModalOpen(false);
+    fetchOrders();
+  } catch (err) {
+    console.error("Failed to update order:", err);
+  }
+};
+
+  // Statistikat e roleve
   const roleCounts = users.reduce((acc, user) => {
     acc[user.role] = (acc[user.role] || 0) + 1;
     return acc;
   }, {});
 
+  // Data për charts
   const donutData = {
     labels: Object.keys(roleCounts),
     datasets: [
@@ -227,12 +297,19 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="top-bar">
+      {/* <div className="top-bar">
         <button className="btn-add" onClick={() => setIsAddModalOpen(true)}>Shto</button>
-      </div>
+      </div> */}
 
-      <h2>Lista e përdoruesve</h2>
-      <table className="user-table">
+    <div className="toggle-buttons">
+  <button onClick={() => setShowUsers(prev => !prev)}>
+    {showUsers ? "Fshih Përdoruesit" : "Shfaq Përdoruesit"}
+  </button>
+</div>
+{showUsers && (
+  <>
+    <h2>Lista e përdoruesve</h2>
+    <table className="user-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -252,6 +329,8 @@ useEffect(() => {
 
               <td>
                 <div style={{ display: 'flex', gap: '10px' }}>
+                          <button className="btn-add" onClick={() => setIsAddModalOpen(true)}>Shto</button>
+
                   <button className="btn-edit" onClick={() => handleEditClick(user)}>Edito</button>
                   <button className="btn-delete" onClick={() => handleDeleteUser(user.id)}>Fshij</button>
                 </div>
@@ -259,36 +338,94 @@ useEffect(() => {
             </tr>
           ))}
         </tbody>
+     </table>
+  </>
+)}
+
+     <div className="toggle-buttons">
+  <button onClick={() => setShowMessages(prev => !prev)}>
+    {showMessages ? "Fshih Mesazhet" : "Shfaq Mesazhet"}
+  </button>
+</div>
+{showMessages && (
+  <>
+    <h2>Contact Form</h2>
+    <table className="user-table">
+        <thead>
+          <tr>
+            <th>Emri</th>
+            <th>Mbiemri</th>
+            <th>Email</th>
+            <th>Telefoni</th>
+            <th>Mesazhi</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {messages.map((msg, index) => (
+            <tr key={index}>
+              <td>{msg.emri}</td>
+              <td>{msg.mbiemri}</td>
+              <td>{msg.email}</td>
+              <td>{msg.telefoni}</td>
+              <td>{msg.mesazhi}</td>
+              <td>{new Date(msg.createdAt).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+         </table>
+  </>
+)}
+
+
+
+    <div className="toggle-buttons">
+  <button onClick={() => setShowOrders(prev => !prev)}>
+    {showOrders ? "Fshih Porositë" : "Shfaq Porositë"}
+  </button>
+</div>
+{showOrders && (
+  <>
+    <h2>Lista e porosive</h2>
+    <table className="user-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Përdoruesi</th>
+            <th>Produkti</th>
+            <th>Çmimi</th>
+            <th>Data e porosisë</th>
+            <th>Statusi</th>
+            <th>Veprime</th>  {/* Shto këtë */}
+          </tr>
+        </thead>
+        <tbody>
+         {orders.map((order) => (
+  <tr key={order.id}>
+    <td>{order.id}</td>
+    <td>{order.username || order.userId}</td>
+    <td>{order.apartmentName || order.apartmentId}</td>
+    <td>{order.apartmentPrice ? `$${order.apartmentPrice}` : "-"}</td>
+    <td>{new Date(order.orderDate).toLocaleString()}</td>
+    <td>{order.status || "N/A"}</td>
+     <td>
+  <div style={{ display: 'flex', gap: '10px' }}>
+    <button className="btn-edit" onClick={() => handleEditOrder(order)}>Edito</button>
+    <button className="btn-delete" onClick={() => handleDeleteOrder(order.id)}>Fshij</button>
+  </div>
+</td>
+
+  </tr>
+))}
+
+        </tbody>
       </table>
+  </>
+)}
+   
 
-      <h2>Contact Form</h2>
-<table className="user-table">
-  <thead>
-    <tr>
-      <th>Emri</th>
-      <th>Mbiemri</th>
-      <th>Email</th>
-      <th>Telefoni</th>
-      <th>Mesazhi</th>
-      <th>Data</th>
-    </tr>
-  </thead>
-  <tbody>
-    {messages.map((msg, index) => (
-      <tr key={index}>
-        <td>{msg.name}</td>
-        <td>{msg.lastname}</td>
-        <td>{msg.email}</td>
-        <td>{msg.phone}</td>
-        <td>{msg.message}</td>
-        <td>{new Date(msg.date).toLocaleString()}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-
-      {/* Add User Modal */}
+      {/* Modal për shtimin e përdoruesit */}
+     {/* Add User Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSubmit={handleAddUser}>
         <h2>Shto përdorues të ri</h2>
         <form onSubmit={handleAddUser} className="add-user-form">
@@ -322,9 +459,7 @@ useEffect(() => {
           </select>
         </form>
       </Modal>
-
-      {/* Edit User Modal */}
-      {editingUser && (
+     {editingUser && (
         <Modal isOpen={isEditModalOpen} onClose={() => setEditingUser(null)} onSubmit={handleSaveEdit}>
           <h3>Edito Përdoruesin</h3>
           <form onSubmit={handleSaveEdit} className="add-user-form">
@@ -350,9 +485,72 @@ useEffect(() => {
           </form>
         </Modal>
       )}
+{/* {isEditOrderModalOpen && editingOrder && (
+<Modal
+  isOpen={isEditOrderModalOpen}
+  onClose={() => setIsEditOrderModalOpen(false)}
+  onSubmit={handleSaveOrderEdit}
+>
+    <h2>Edito Porosinë</h2>
+    <form onSubmit={handleSaveOrderEdit} className="modal-form">
+      <label>Statusi:</label>
+      <select name="status" value={editingOrder.status} onChange={handleOrderChange}>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="canceled">Canceled</option>
+      </select>
+
+      <label>Data e Porosisë:</label>
+      <input
+        type="date"
+        name="orderDate"
+        value={editingOrder.orderDate?.slice(0, 10) || ""}
+        onChange={handleOrderChange}
+      />
+
+    </form>
+  </Modal>
+)} */}
+{isEditOrderModalOpen && editingOrder && (
+  <Modal
+    isOpen={isEditOrderModalOpen}
+    onClose={() => setIsEditOrderModalOpen(false)}
+    onSubmit={handleSaveOrderEdit}
+  >
+    <h3>Edito Porosinë</h3>
+    <form onSubmit={handleSaveOrderEdit} className="add-user-form">
+      <label>Statusi</label>
+      <select
+        name="status"
+        value={editingOrder.status}
+        onChange={handleOrderChange}
+        required
+      >
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+      <label>Data e porosisë</label>
+      <input
+        name="orderDate"
+        type="datetime-local"
+        value={editingOrder.orderDate ? new Date(editingOrder.orderDate).toISOString().slice(0,16) : ""}
+        onChange={handleOrderChange}
+        required
+      />
+
+     
+    </form>
+  </Modal>
+)}
+
+
 
     </div>
   );
 }
+
 
 export default Dashboard;

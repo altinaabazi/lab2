@@ -19,6 +19,30 @@
        border-radius: 10px;
      }
    }
+   .buyButton {
+  padding: 10px 20px;
+  background-color: #fecd51; // ngjyra kryesore
+  color: #000;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  align-self: flex-start;
+
+  &:hover {
+    background-color: #e6b84a;
+    transform: scale(1.03);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
    .textContainer {
      flex: 3;
      display: flex;
@@ -96,6 +120,7 @@
            &:hover {
              background-color: lightgray;
            }
+           
          }
        }
      }

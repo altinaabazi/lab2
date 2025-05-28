@@ -9,6 +9,28 @@
     margin-bottom: 20px;
   }
 
+  .toggle-buttons {
+    display: flex;
+    flex-wrap: nowrap;       // S’lejon thyerjen në rresht tjetër
+    gap: 12px;               // Hapësirë mes butonave
+    margin-bottom: 30px;
+
+    button {
+      margin: 0;             // Hiq margin vertikale
+      padding: 10px 20px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
   .user-stats {
     display: flex;
     justify-content: space-between;
@@ -43,24 +65,33 @@
       }
     }
   }
-.add-user-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 30px;
 
-  input, select, button {
-    padding: 10px;
-    font-size: 16px;
-  }
+  .add-user-form {
+    display: flex;
+    flex-wrap: nowrap;      // Rresht horizontal input/button
+    gap: 12px;
+    margin-bottom: 30px;
 
-  button {
-    background-color: #0e3b5c;
-    color: white;
-    border: none;
-    cursor: pointer;
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      flex: 1;              // Merr gjithë hapësirën e mbetur horizontale
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #0e3b5c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #08314b;
+      }
+    }
   }
-}
 
   .charts {
     display: flex;

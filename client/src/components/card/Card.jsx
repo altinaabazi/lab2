@@ -1,7 +1,14 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./card.scss";
+import Order from "../order/Order";
 
 function Card({ item }) {
+  const [showOrderForm, setShowOrderForm] = useState(false);
+
+  const openOrderForm = () => setShowOrderForm(true);
+  const closeOrderForm = () => setShowOrderForm(false);
+
   return (
     <div className="card">
       <Link to={`/${item.id}`} className="imageContainer">
@@ -32,14 +39,18 @@ function Card({ item }) {
               <img src="/save.png" alt="" />
             </div>
             <div className="icon">
-              {/* Use Link here to open the chat page */}
               <Link to={`/chat/${item.id}`}>
                 <img src="/chat.png" alt="" />
               </Link>
             </div>
           </div>
         </div>
+        <button className="buyButton" onClick={openOrderForm}>Buy</button>
       </div>
+{showOrderForm && (
+  <Order postId={item.id} price={item.price} onClose={closeOrderForm} />
+)}
+
     </div>
   );
 }

@@ -30,7 +30,7 @@ function Navbar() {
         {currentUser?.role === "ADMIN" ? (
           <Link to="/dashboard">Dashboard</Link>
         ) : (
-          <a href="/">Agents</a>
+          <a href="/post">Agents</a>
         )}
       </div>
 

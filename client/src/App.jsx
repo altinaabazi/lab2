@@ -15,6 +15,7 @@ import About from "./pages/about/About";
 import Footer from "./pages/footer/Footer";
 import Contact from "./pages/contact/Contact";
 import Chat from "./components/chat/chat";
+import PostsPage from "./pages/postPage/PostsPage";
 function App() {
   const router = createBrowserRouter([
     {
@@ -82,6 +83,10 @@ function App() {
         {
           path: "/add",
           element: <NewPostPage />, // Faqja për shtimin e postimeve
+        },
+         {
+          path: "/post",
+          element: <PostsPage />, // Faqja për shtimin e postimeve
         },
       ],
     },

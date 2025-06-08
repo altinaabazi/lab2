@@ -5,6 +5,7 @@ import { Doughnut, Line, Bar } from "react-chartjs-2";
 import { AuthContext } from "../../context/AuthContext";
 import Modal from "../../components/modal/Modal";
 import "./Dashboard.scss";
+import { Link } from "react-router-dom";
 
 // Importo komponentet e nevojshme nga Chart.js
 import {
@@ -47,6 +48,8 @@ const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
 const [showUsers, setShowUsers] = useState(false);
 const [showMessages, setShowMessages] = useState(false);
 const [showOrders, setShowOrders] = useState(false);
+ const [totalPosts, setTotalPosts] = useState(0);
+
 
   // Shtesë: orders
   const [orders, setOrders] = useState([]);
@@ -103,6 +106,26 @@ const fetchOrders = async () => {
       console.error("Failed to fetch users:", err);
     }
   };
+
+useEffect(() => {
+    const fetchPostCount = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8800/api/posts/count`, {
+  withCredentials: true,
+});
+
+        console.log("Response from API:", response.data);
+        setTotalPosts(response.data.total);
+        console.log("Response from API:", response.data);
+
+      } catch (error) {
+        console.error("Error fetching posts count:", error);
+      }
+    };
+
+    fetchPostCount();
+  }, []);
+
 
   // Funksionet për shtimin, fshirjen dhe editimin e përdoruesve
   const handleAddUser = async (e) => {
@@ -264,6 +287,13 @@ const handleSaveOrderEdit = async (e) => {
   return (
     <div className="dashboard">
       <h1>Dashboard</h1>
+     <Link to="/add" className="add-link">Shto Apartmente</Link>
+     <div className="cart">
+  <h2>Totali i Apartamenteve të Shtuara: {totalPosts}</h2>
+</div>
+
+
+
 
       <div className="user-stats">
         <div className="stat-card">

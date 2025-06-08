@@ -1,0 +1,203 @@
+.post-page {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #222;
+    text-align: center;
+  }
+
+  .posts-grid {
+    display: grid;
+    gap: 1.5rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(1, 1fr);
+    }
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr); /* vetem dy poste ne rresht */
+    }
+  }
+
+  .post-wrapper {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    /* Hiq width fikse dhe lejo që grid-i ta përcaktojë gjerësinë */
+    /* width: 600px; */
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 6px 14px rgb(0 0 0 / 0.15);
+    }
+
+    .edit-btn,
+    .delete-btn {
+      width: 100px; 
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      margin-top: -32px;
+      margin-left: 450px;
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px #93c5fd;
+      }
+    }
+
+    .edit-btn {
+      background-color: #3b82f6;
+      color: white;
+
+      &:hover {
+        background-color: #2563eb;
+      }
+    }
+
+    .delete-btn {
+      background-color: #ef4444;
+      color: white;
+      margin-left: 0.5rem;
+
+      &:hover {
+        background-color: #dc2626;
+      }
+    }
+
+    /* Butonat edit dhe delete në një rresht */
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .status-message {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 600;
+
+    &.loading {
+      color: #2563eb;
+    }
+    &.error {
+      color: #ef4444;
+    }
+  }
+
+  /* Modal backdrop dhe modal (nga EditPostModal) */   
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      label {
+        font-weight: 600;
+        color: #444;
+        display: flex;
+        flex-direction: column;
+
+        input,
+        textarea,
+        select {
+          margin-top: 0.25rem;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          font-size: 1rem;
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color 0.2s ease;
+
+          &:focus {
+            border-color: #3b82f6;
+            outline: none;
+          }
+        }
+
+        textarea {
+          min-height: 80px;
+        }
+      }
+
+      button[type="submit"] {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #2563eb;
+        }
+      }
+
+      button[type="button"] {
+        background-color: #ef4444;
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-left: 10px;
+
+        &:hover {
+          background-color: #dc2626;
+        }
+      }
+
+      .buttons-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+      }
+    }
+  }
+}

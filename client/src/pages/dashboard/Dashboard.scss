@@ -153,6 +153,38 @@
     }
   }
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 6px;
+
+  button {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &.active {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    padding: 6px 10px;
+    color: #888;
+  }
+}
+
+
 
 .add-link {
   display: inline-block;

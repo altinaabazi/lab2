@@ -31,6 +31,8 @@ model Post {
   userId     String      @db.ObjectId
   postDetail PostDetail?
   savedPosts SavedPost[]
+  isSold     Boolean     @default(false) 
+
 }
 
 enum Type {
@@ -105,5 +107,14 @@ model Message {
   userId    String
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+}
+model ContactMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  lastname  String
+  email     String
+  phone     String
+  message   String
   createdAt DateTime @default(now())
 }

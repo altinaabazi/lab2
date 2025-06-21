@@ -5,9 +5,9 @@ import { Elements, CardElement, useStripe, useElements } from "@stripe/react-str
 import axios from "axios";
 import "./order.scss";
 
-const stripePromise = loadStripe("pk_test_51RVuwTE1C5TUC3cqE1LbZRb1DBpvficMSs7LqIbQKruaOnrpLZyhKiT7nKv3AwVhLYF1PDeR5QsqfOT20KNkV15C00iOT4oNts");
+const stripePromise = loadStripe("pk_test_51RSfHDQtoJs1pwT7gpsoZfWYtjAyqX5s3pDBC2k5RR34r2CNzUBgnn8qKQwJWdyoDrudJVUEteyLBiq3yrbnILX900nvPVWJp5");
 
-function CheckoutForm({ apartmentId, price, onClose }) {
+function CheckoutForm({ apartmentId, price, onClose, onUpdateSoldStatus }) {
   const stripe = useStripe();
   const elements = useElements();
   const { currentUser } = useContext(AuthContext);
@@ -15,7 +15,6 @@ function CheckoutForm({ apartmentId, price, onClose }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Fushat e formës
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -23,7 +22,6 @@ function CheckoutForm({ apartmentId, price, onClose }) {
     paymentMethod: "cash", // default cash
   });
 
-  // Ndryshimi i fushave të formës
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -32,7 +30,6 @@ function CheckoutForm({ apartmentId, price, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Kontrollo fusha te domosdoshme
     if (!formData.name || !formData.phone || !formData.email) {
       setMessage("Ju lutem plotësoni të gjitha fushat.");
       return;
@@ -43,7 +40,7 @@ function CheckoutForm({ apartmentId, price, onClose }) {
 
     try {
       if (formData.paymentMethod === "cash") {
-        // Porosia Cash, thjesht dergo ne backend pa Stripe
+        // Porosia Cash - thjesht dergo në backend pa Stripe
         await axios.post("http://localhost:8800/api/orders", {
           userId: currentUser.id,
           apartmentId,
@@ -55,6 +52,14 @@ function CheckoutForm({ apartmentId, price, onClose }) {
         });
 
         setMessage("Porosia u krye me sukses me Cash.");
+
+        // Përditëso statusin në parent që banesa është shitur
+        if (onUpdateSoldStatus) onUpdateSoldStatus(apartmentId, true);
+
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+
       } else if (formData.paymentMethod === "stripe") {
         // Krijo porosi dhe merr clientSecret për Stripe
         const res = await axios.post("http://localhost:8800/api/orders", {
@@ -79,6 +84,19 @@ function CheckoutForm({ apartmentId, price, onClose }) {
           setMessage("Gabim në pagesë: " + result.error.message);
         } else if (result.paymentIntent.status === "succeeded") {
           setMessage("Pagesa u krye me sukses!");
+
+          // Thërrit backend për të përditësuar statusin e apartamentit si 'sold'
+          await axios.post("http://localhost:8800/api/orders/mark-sold", {
+            apartmentId,
+            paymentIntentId: result.paymentIntent.id,
+          });
+
+          // Përditëso statusin në parent që banesa është shitur
+          if (onUpdateSoldStatus) onUpdateSoldStatus(apartmentId, true);
+
+          setTimeout(() => {
+            onClose();
+          }, 2000);
         }
       }
     } catch (err) {
@@ -146,7 +164,6 @@ function CheckoutForm({ apartmentId, price, onClose }) {
         </label>
       </div>
 
-      {/* Nëse përdoruesi zgjidh Stripe, shfaq formularin e kartës */}
       {formData.paymentMethod === "stripe" && (
         <>
           <label>Detajet e kartës:</label>
@@ -154,7 +171,10 @@ function CheckoutForm({ apartmentId, price, onClose }) {
         </>
       )}
 
-      <button type="submit" disabled={loading || (formData.paymentMethod === "stripe" && !stripe)}>
+      <button
+        type="submit"
+        disabled={loading || (formData.paymentMethod === "stripe" && !stripe)}
+      >
         {loading ? "Duke procesuar..." : "Porositi"}
       </button>
 
@@ -167,7 +187,7 @@ function CheckoutForm({ apartmentId, price, onClose }) {
   );
 }
 
-function Order({ postId, price, onClose }) {
+function Order({ postId, price, onClose, onUpdateSoldStatus }) {
   const { currentUser } = useContext(AuthContext);
 
   if (!currentUser) {
@@ -182,7 +202,12 @@ function Order({ postId, price, onClose }) {
   return (
     <div className="order-popup">
       <Elements stripe={stripePromise}>
-        <CheckoutForm apartmentId={postId} price={price} onClose={onClose} />
+        <CheckoutForm
+          apartmentId={postId}
+          price={price}
+          onClose={onClose}
+          onUpdateSoldStatus={onUpdateSoldStatus}
+        />
       </Elements>
     </div>
   );

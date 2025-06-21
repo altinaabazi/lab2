@@ -44,27 +44,50 @@ function Dashboard() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [messages, setMessages] = useState([]);
 const [editingOrder, setEditingOrder] = useState(null);
+// Shtesë: orders
+const [orders, setOrders] = useState([]);
+
 const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
 const [showUsers, setShowUsers] = useState(false);
 const [showMessages, setShowMessages] = useState(false);
 const [showOrders, setShowOrders] = useState(false);
  const [totalPosts, setTotalPosts] = useState(0);
+const [currentPageUsers, setCurrentPageUsers] = useState(1);
+const usersPerPage = 5;
+
+const indexOfLastUser = currentPageUsers * usersPerPage;
+const indexOfFirstUser = indexOfLastUser - usersPerPage;
+const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+const totalPagesUsers = Math.ceil(users.length / usersPerPage);
+// Paginacion për Porositë
+const [currentPageOrders, setCurrentPageOrders] = useState(1);
+const ordersPerPage = 5;
+const indexOfLastOrder = currentPageOrders * ordersPerPage;
+const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+const totalPagesOrders = Math.ceil(orders.length / ordersPerPage);
+
+// Paginacion për Mesazhet
+const [currentPageMessages, setCurrentPageMessages] = useState(1);
+const messagesPerPage = 5;
+const indexOfLastMessage = currentPageMessages * messagesPerPage;
+const indexOfFirstMessage = indexOfLastMessage - messagesPerPage;
+const currentMessages = messages.slice(indexOfFirstMessage, indexOfLastMessage);
+const totalPagesMessages = Math.ceil(messages.length / messagesPerPage);
 
 
-  // Shtesë: orders
-  const [orders, setOrders] = useState([]);
 
   // Funksioni për marrjen e mesazheve
-  const fetchMessages = async () => {
-    try {
-      const res = await axios.get("http://localhost:8800/api/contact", {
-        withCredentials: true,
-      });
-      setMessages(res.data);
-    } catch (err) {
-      console.error("Gabim gjatë marrjes së mesazheve:", err);
-    }
-  };
+ const fetchMessages = async () => {
+  try {
+    const res = await axios.get("http://localhost:8800/api/contact", { withCredentials: true });
+    setMessages(res.data);
+  } catch (err) {
+    console.error("Gabim gjatë marrjes së mesazheve:", err);
+  }
+};
+
 
 const fetchOrders = async () => {
     try {
@@ -350,7 +373,7 @@ const handleSaveOrderEdit = async (e) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+{currentUsers.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.username}</td>
@@ -369,6 +392,41 @@ const handleSaveOrderEdit = async (e) => {
           ))}
         </tbody>
      </table>
+    <div className="pagination">
+  <button
+    onClick={() => setCurrentPageUsers(prev => Math.max(prev - 1, 1))}
+    disabled={currentPageUsers === 1}
+  >
+    Prev
+  </button>
+
+  {currentPageUsers > 2 && <span>...</span>}
+
+  {currentPageUsers > 1 && (
+    <button onClick={() => setCurrentPageUsers(currentPageUsers - 1)}>
+      {currentPageUsers - 1}
+    </button>
+  )}
+
+  <button className="active">{currentPageUsers}</button>
+
+  {currentPageUsers < totalPagesUsers && (
+    <button onClick={() => setCurrentPageUsers(currentPageUsers + 1)}>
+      {currentPageUsers + 1}
+    </button>
+  )}
+
+  {currentPageUsers < totalPagesUsers - 1 && <span>...</span>}
+
+  <button
+    onClick={() => setCurrentPageUsers(prev => Math.min(prev + 1, totalPagesUsers))}
+    disabled={currentPageUsers === totalPagesUsers}
+  >
+    Next
+  </button>
+</div>
+
+
   </>
 )}
 
@@ -391,19 +449,56 @@ const handleSaveOrderEdit = async (e) => {
             <th>Data</th>
           </tr>
         </thead>
-        <tbody>
-          {messages.map((msg, index) => (
-            <tr key={index}>
-              <td>{msg.emri}</td>
-              <td>{msg.mbiemri}</td>
-              <td>{msg.email}</td>
-              <td>{msg.telefoni}</td>
-              <td>{msg.mesazhi}</td>
-              <td>{new Date(msg.createdAt).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
+<tbody>
+  {currentMessages.map((msg, index) => (
+    <tr key={index}>
+      <td>{msg.name}</td>
+      <td>{msg.lastname}</td>
+      <td>{msg.email}</td>
+      <td>{msg.phone}</td>
+      <td>{msg.message}</td>
+<td>{new Date(msg.createdAt).toLocaleString()}</td>
+    </tr>
+  ))}
+</tbody>
+
+      
          </table>
+        <div className="pagination">
+  <button
+    onClick={() => setCurrentPageMessages(prev => Math.max(prev - 1, 1))}
+    disabled={currentPageMessages === 1}
+  >
+    Prev
+  </button>
+
+  {currentPageMessages > 2 && <span>...</span>}
+
+  {currentPageMessages > 1 && (
+    <button onClick={() => setCurrentPageMessages(currentPageMessages - 1)}>
+      {currentPageMessages - 1}
+    </button>
+  )}
+
+  <button className="active">{currentPageMessages}</button>
+
+  {currentPageMessages < totalPagesMessages && (
+    <button onClick={() => setCurrentPageMessages(currentPageMessages + 1)}>
+      {currentPageMessages + 1}
+    </button>
+  )}
+
+  {currentPageMessages < totalPagesMessages - 1 && <span>...</span>}
+
+  <button
+    onClick={() => setCurrentPageMessages(prev => Math.min(prev + 1, totalPagesMessages))}
+    disabled={currentPageMessages === totalPagesMessages}
+  >
+    Next
+  </button>
+</div>
+
+
   </>
 )}
 
@@ -430,7 +525,7 @@ const handleSaveOrderEdit = async (e) => {
           </tr>
         </thead>
         <tbody>
-         {orders.map((order) => (
+{currentOrders.map((order) => (
   <tr key={order.id}>
     <td>{order.id}</td>
     <td>{order.username || order.userId}</td>
@@ -450,6 +545,42 @@ const handleSaveOrderEdit = async (e) => {
 
         </tbody>
       </table>
+    <div className="pagination">
+  <button
+    onClick={() => setCurrentPageOrders(prev => Math.max(prev - 1, 1))}
+    disabled={currentPageOrders === 1}
+  >
+    Prev
+  </button>
+
+  {currentPageOrders > 2 && <span>...</span>}
+
+  {currentPageOrders > 1 && (
+    <button onClick={() => setCurrentPageOrders(currentPageOrders - 1)}>
+      {currentPageOrders - 1}
+    </button>
+  )}
+
+  <button className="active">{currentPageOrders}</button>
+
+  {currentPageOrders < totalPagesOrders && (
+    <button onClick={() => setCurrentPageOrders(currentPageOrders + 1)}>
+      {currentPageOrders + 1}
+    </button>
+  )}
+
+  {currentPageOrders < totalPagesOrders - 1 && <span>...</span>}
+
+  <button
+    onClick={() => setCurrentPageOrders(prev => Math.min(prev + 1, totalPagesOrders))}
+    disabled={currentPageOrders === totalPagesOrders}
+  >
+    Next
+  </button>
+</div>
+
+
+
   </>
 )}
    
@@ -556,10 +687,14 @@ const handleSaveOrderEdit = async (e) => {
         onChange={handleOrderChange}
         required
       >
-        <option value="Pending">Pending</option>
+        {/* <option value="Pending">Pending</option>
         <option value="In Progress">In Progress</option>
         <option value="Completed">Completed</option>
-        <option value="Cancelled">Cancelled</option>
+        <option value="Cancelled">Cancelled</option> */}
+        <option value="pending">Pending</option>
+<option value="completed">Completed</option>
+<option value="cancelled">Cancelled</option>
+
       </select>
 
       <label>Data e porosisë</label>

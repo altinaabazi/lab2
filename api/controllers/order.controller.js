@@ -5,51 +5,128 @@ import { getSqlPool, sql } from "../lib/sql.js";
 // Inicjalizo Stripe me çelësin sekret nga .env
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// ===========================
 // Krijimi i një porosie të re
+// ===========================
 export const createOrder = async (req, res) => {
-    const { userId, apartmentId, amount } = req.body;
+  const {
+    userId,
+    apartmentId,
+    amount,
+    paymentMethod,
+    customerName,
+    customerPhone,
+    customerEmail,
+  } = req.body;
 
-    // Validimi i input-it
-    if (!userId || !apartmentId || !amount) {
-        return res.status(400).json({ message: "UserId, ApartmentId dhe amount janë të nevojshme" });
+  if (!userId || !apartmentId || !amount || !paymentMethod) {
+    return res
+      .status(400)
+      .json({ message: "UserId, ApartmentId, amount dhe paymentMethod janë të nevojshme" });
+  }
+
+  try {
+    // Kontrollo në MongoDB nëse apartamenti është shitur
+    const apartment = await prisma.post.findUnique({
+      where: { id: apartmentId },
+    });
+
+    if (!apartment) {
+      return res.status(404).json({ message: "Apartamenti nuk u gjet" });
     }
 
-    try {
-        // 1. Krijo një Payment Intent në Stripe
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount, // në cent (p.sh. 25000 për 250 USD)
-            currency: "usd",
-            payment_method_types: ["card"],
-            metadata: {
-                userId,
-                apartmentId,
-            },
-        });
-
-        // 2. Lidhe me databazën dhe ruaj porosinë me status "pending"
-        const pool = await getSqlPool();
-
-        await pool.request()
-            .input("UserId", sql.NVarChar(50), userId)
-            .input("ApartmentId", sql.NVarChar(24), apartmentId)
-            .input("PaymentIntentId", sql.NVarChar(100), paymentIntent.id)
-            .input("OrderDate", sql.DateTime, new Date())
-            .input("Status", sql.NVarChar(20), "pending")
-            .query(`
-        INSERT INTO Orders (UserId, ApartmentId, PaymentIntentId, OrderDate, Status)
-        VALUES (@UserId, @ApartmentId, @PaymentIntentId, @OrderDate, @Status)
-      `);
-
-        // 3. Kthe klientit client_secret për të vazhduar me pagesën në frontend
-        res.status(201).json({
-            clientSecret: paymentIntent.client_secret,
-            message: "Order created, please proceed with payment",
-        });
-
-    } catch (err) {
-        console.error("Error creating order:", err);
-        res.status(500).json({ message: "Failed to create order" });
+    if (apartment.isSold) {
+      return res.status(400).json({ message: "Apartamenti është tashmë i shitur" });
     }
+
+    const pool = await getSqlPool();
+
+    if (paymentMethod === "cash") {
+      // Ruaj porosinë direkt me status 'completed' sepse nuk ka pagesë me Stripe
+      await pool.request()
+        .input("UserId", sql.NVarChar(50), userId)
+        .input("ApartmentId", sql.NVarChar(24), apartmentId)
+        .input("PaymentIntentId", sql.NVarChar(100), null)
+        .input("OrderDate", sql.DateTime, new Date())
+        .input("Status", sql.NVarChar(20), "completed")
+        .query(`
+          INSERT INTO Orders (UserId, ApartmentId, PaymentIntentId, OrderDate, Status)
+          VALUES (@UserId, @ApartmentId, @PaymentIntentId, @OrderDate, @Status)
+        `);
+
+      // Përditëso MongoDB për banesën si të shitur
+      await prisma.post.update({
+        where: { id: apartmentId },
+        data: { isSold: true },
+      });
+
+      return res.status(201).json({ message: "Porosia me cash u krijua me sukses." });
+
+    } else if (paymentMethod === "stripe") {
+      // Krijo PaymentIntent në Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+        metadata: { userId, apartmentId },
+      });
+
+      // Ruaj porosinë me status pending
+      await pool.request()
+        .input("UserId", sql.NVarChar(50), userId)
+        .input("ApartmentId", sql.NVarChar(24), apartmentId)
+        .input("PaymentIntentId", sql.NVarChar(100), paymentIntent.id)
+        .input("OrderDate", sql.DateTime, new Date())
+        .input("Status", sql.NVarChar(20), "pending")
+        .query(`
+          INSERT INTO Orders (UserId, ApartmentId, PaymentIntentId, OrderDate, Status)
+          VALUES (@UserId, @ApartmentId, @PaymentIntentId, @OrderDate, @Status)
+        `);
+
+      return res.status(201).json({
+        clientSecret: paymentIntent.client_secret,
+        message: "Order created, please proceed with payment",
+      });
+    } else {
+      return res.status(400).json({ message: "Mënyra e pagesës nuk mbështetet" });
+    }
+  } catch (err) {
+    console.error("Error creating order:", err);
+    res.status(500).json({ message: "Failed to create order" });
+  }
+};
+
+// =====================================
+// Përditëso statusin e apartamentit si 'sold' pas suksesit me Stripe
+// =====================================
+export const markApartmentAsSold = async (req, res) => {
+  const { apartmentId, paymentIntentId } = req.body;
+
+  if (!apartmentId || !paymentIntentId) {
+    return res
+      .status(400)
+      .json({ message: "ApartmentId dhe PaymentIntentId janë të nevojshme" });
+  }
+
+  try {
+    const pool = await getSqlPool();
+
+    // 1. Përditëso statusin në SQL
+    await pool.request()
+      .input("PaymentIntentId", paymentIntentId)
+      .query(`UPDATE Orders SET Status = 'completed' WHERE PaymentIntentId = @PaymentIntentId`);
+
+    // 2. Përditëso apartamentin në MongoDB
+    await prisma.post.update({
+      where: { id: apartmentId },
+      data: { isSold: true },
+    });
+
+    res.status(200).json({ message: "Apartment marked as sold successfully" });
+  } catch (error) {
+    console.error("Gabim në markApartmentAsSold:", error);
+    res.status(500).json({ message: "Failed to mark apartment as sold" });
+  }
 };
 
 // Merr të gjitha porositë (për admin dashboard ose histori)
@@ -162,7 +239,39 @@ export const updateOrder = async (req, res) => {
     if (result.rowsAffected[0] === 0) {
       return res.status(404).json({ message: "Porosia nuk u gjet për përditësim" });
     }
+ if (status === "completed") {
+      // Mark as sold = isSold = true
+      const orderQuery = await pool.request()
+        .input("Id", sql.Int, id)
+        .query(`SELECT ApartmentId FROM Orders WHERE Id = @Id`);
 
+      const apartmentId = orderQuery.recordset[0]?.ApartmentId;
+
+      if (apartmentId) {
+        await prisma.post.update({
+          where: { id: apartmentId },
+          data: { isSold: true },
+        });
+      }
+} else if (status === "pending" || status === "cancelled") {
+      // Unmark as sold = isSold = false
+      try {
+        const orderQuery = await pool.request()
+          .input("Id", sql.Int, id)
+          .query(`SELECT ApartmentId FROM Orders WHERE Id = @Id`);
+
+        const apartmentId = orderQuery.recordset[0]?.ApartmentId;
+
+        if (apartmentId) {
+          await prisma.post.update({
+            where: { id: apartmentId },
+            data: { isSold: false },
+          });
+        }
+      } catch (err) {
+        console.error("Gabim gjatë unmarkimit të apartamentit si sold:", err);
+      }
+    }
     res.status(200).json({ message: "Porosia u përditësua me sukses" });
   } catch (error) {
     console.error("Gabim në updateOrder:", error);

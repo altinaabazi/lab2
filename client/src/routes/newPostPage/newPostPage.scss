@@ -1,75 +1,187 @@
-.newPostPage {
-    height: 100%;
-    display: flex;
+// .newPostPage {
+//     height: 100%;
+//     display: flex;
   
-    .formContainer {
-      flex: 3;
-      overflow: scroll;
+//     .formContainer {
+//       flex: 3;
+//       overflow: scroll;
   
-      .wrapper {
-        margin: 30px 50px 100px 0px;
+//       .wrapper {
+//         margin: 30px 50px 100px 0px;
   
-        form {
-          display: flex;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 20px;
+//         form {
+//           display: flex;
+//           justify-content: space-between;
+//           flex-wrap: wrap;
+//           gap: 20px;
   
-          .item {
-            width: 30%;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+//           .item {
+//             width: 30%;
+//             display: flex;
+//             flex-direction: column;
+//             gap: 5px;
   
           
   
-            input {
-              padding: 20px;
-              border-radius: 5px;
-              border: 1px solid gray;
-            }
+//             input {
+//               padding: 20px;
+//               border-radius: 5px;
+//               border: 1px solid gray;
+//             }
   
-            select {
-              padding: 19px;
-            }
+//             select {
+//               padding: 19px;
+//             }
   
-            &.description {
-              width: 100%;
-              height: 320px;
+//             &.description {
+//               width: 100%;
+//               height: 320px;
   
-              .quill > .ql-container > .ql-editor{
-                height: 200px;
-                font-size: 16px;
-              }
+//               .quill > .ql-container > .ql-editor{
+//                 height: 200px;
+//                 font-size: 16px;
+//               }
+//             }
+//           }
+//           .sendButton {
+//             width: 30%;
+//             border-radius: 5px;
+//             border: none;
+//             background-color: teal;
+//             color: white;
+//             font-weight: bold;
+//             cursor: pointer;
+//           }
+//         }
+//       }
+//     }
+  
+//     .sideContainer {
+//       flex: 2;
+//       background-color: #fcf5f3;
+//       display: flex;
+//       flex-direction: column;
+//       gap: 20px;
+//       align-items: center;
+//       justify-content: center;
+  
+//       img {
+//         width: 50%;
+//         height: 180px;
+//         object-fit: cover;
+//         border-radius: 5px;
+//       }
+//     }
+//   }
+
+.newPostPage {
+  padding: 3rem;
+  background: #f3f4f6;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+
+  .form {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .form-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-align: center;
+      color: #111827;
+    }
+
+    .section {
+      h2 {
+        font-size: 1.3rem;
+        color: #374151;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+
+        .form-item {
+          display: flex;
+          flex-direction: column;
+
+          label {
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #4b5563;
+          }
+
+          input,
+          select {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            background: #f9fafb;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+
+            &:focus {
+              background: #fff;
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
             }
           }
-          .sendButton {
-            width: 30%;
-            border-radius: 5px;
-            border: none;
-            background-color: teal;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
+
+          .ql-container {
+            border-radius: 10px;
           }
         }
       }
-    }
-  
-    .sideContainer {
-      flex: 2;
-      background-color: #fcf5f3;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      align-items: center;
-      justify-content: center;
-  
-      img {
-        width: 50%;
-        height: 180px;
-        object-fit: cover;
-        border-radius: 5px;
+
+      .preview {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        img {
+          width: 120px;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 10px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
       }
     }
+
+    .submit-btn {
+      background: #3b82f6;
+      color: white;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      align-self: flex-end;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: #2563eb;
+      }
+    }
+
+    .error {
+      color: #dc2626;
+      font-weight: 500;
+      text-align: center;
+    }
   }
+}

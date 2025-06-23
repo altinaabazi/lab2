@@ -21,12 +21,14 @@ import {
   updatePost,
   deletePost,
   countPosts,
+  postsByCity,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
 
 router.get("/", getPosts);
 router.get("/count",verifyToken, countPosts);
+router.get("/group-by-city", verifyToken, postsByCity);
 router.get("/:id", getPost);
 router.post("/", verifyToken, addPost);
 router.put("/:id", verifyToken, updatePost);

@@ -14,7 +14,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import About from "./pages/about/About";
 import Footer from "./pages/footer/Footer";
 import Contact from "./pages/contact/Contact";
-import Chat from "./components/chat/chat";
+import Chat from "./components/chat/Chat";
 import PostsPage from "./pages/postPage/PostsPage";
 function App() {
   const router = createBrowserRouter([

@@ -21,6 +21,38 @@ export const getUserByUsername = async (req, res) => {
 };
 
 
+// export const getChatWithUser = async (req, res) => {
+//   const tokenUserId = req.userId;       // ID nga token-i i autentifikimit (middleware)
+//   const otherUserId = req.params.userId; // ID nga URL param
+
+//   if (!tokenUserId || !otherUserId) {
+//     return res.status(400).json({ message: "Missing user IDs" });
+//   }
+
+//   try {
+//     const chat = await prisma.chat.findFirst({
+//       where: {
+//         userIDs: {
+//           hasEvery: [tokenUserId, otherUserId], // chat me këta dy usera
+//         },
+//       },
+//       include: {
+//         messages: true,  // opsional, por zakonisht do mesazhet
+//         users: true,     // për info rreth përdoruesve të chat-it
+//       },
+//     });
+
+//     if (!chat) {
+//       return res.status(404).json({ message: "Chat not found" });
+//     }
+
+//     res.status(200).json(chat);
+//   } catch (err) {
+//     console.error("Error in getChatWithUser:", err);
+//     res.status(500).json({ message: "Failed to get chat with user" });
+//   }
+// };
+
 export const getChats = async (req, res) => {
     const tokenUserId = req.userId; // ID e përdoruesit të loguar
   

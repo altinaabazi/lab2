@@ -188,6 +188,21 @@ export const countPosts = async (req, res) => {
     res.status(500).json({ message: "Dështoi marrja e numrit të postimeve" });
   }
 };
+export const postsByCity = async (req, res) => {
+  try {
+    const grouped = await prisma.post.groupBy({
+      by: ['city'],
+      _count: {
+        city: true,
+      },
+    });
+    // Kthe një array me objekte { city: "Tiranë", _count: { city: 10 } }
+    res.status(200).json(grouped);
+  } catch (err) {
+    console.error("Gabim gjatë marrjes së postimeve sipas qyteteve:", err);
+    res.status(500).json({ message: "Dështoi marrja e postimeve sipas qyteteve" });
+  }
+};
 
 export const deletePost = async (req, res) => {
   console.log("ID e përdoruesit nga tokeni:", req.userId);

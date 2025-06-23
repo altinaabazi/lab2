@@ -276,3 +276,36 @@
 .deleteChatBtn:active {
   transform: scale(0.98);
 }
+.message {
+  background-color: white;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.message.unread {
+ color: #235eb6; /* ngjyrë shumë e lehtë verdhe */
+  border: 2px solid #574cf2; /* kufiri i verdhë */
+  font-weight: 600; /* tekst më i trashë për theks */
+  box-shadow: none; /* mund ta heqësh ose lësho */
+}
+
+
+.chatBox .chatMessage {
+  max-width: 60%;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background-color: #eee;
+}
+
+.chatBox .chatMessage p {
+  margin: 0;
+}
+
+.chatBox .chatMessage span {
+  font-size: 0.75rem;
+  color: #666;
+}

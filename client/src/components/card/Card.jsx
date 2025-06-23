@@ -45,11 +45,11 @@ function Card({ item }) {
             <div className="icon">
               <img src="/save.png" alt="" />
             </div>
-            <div className="icon">
+            {/* <div className="icon">
               <Link to={`/chat/${item.id}`}>
                 <img src="/chat.png" alt="" />
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
 

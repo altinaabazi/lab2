@@ -22,7 +22,8 @@ import {
   addChat,
   readChat,
   getUserByUsername,
-  deleteChat
+  deleteChat,
+  // getChatWithUser
 } from "../controllers/chat.controller.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -34,6 +35,6 @@ router.post("/", verifyToken, addChat);
 router.put("/read/:id", verifyToken, readChat);
 router.get("/username/:username", verifyToken, getUserByUsername); 
 router.delete("/:id", verifyToken, deleteChat);
-
+// router.get("/with/:userId", verifyToken, getChatWithUser);
 
 export default router;

@@ -253,7 +253,7 @@ export const updateOrder = async (req, res) => {
           data: { isSold: true },
         });
       }
-} else if (status === "pending" || status === "cancelled") {
+} else if (status === "pending" || status === "canceled") {
       // Unmark as sold = isSold = false
       try {
         const orderQuery = await pool.request()

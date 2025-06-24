@@ -157,6 +157,8 @@ export const updatePost = async (req, res) => {
         longitude: req.body.longitude,
         type: req.body.type,
         property: req.body.property,
+        isSold: req.body.isSold, // ← kjo u shtua
+
         postDetail: {
           update: {
             desc: req.body.postDetail.desc,

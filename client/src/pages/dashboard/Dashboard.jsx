@@ -85,15 +85,15 @@ function Dashboard() {
 
   const [messages, setMessages] = useState([]);
   const [currentPageMessages, setCurrentPageMessages] = useState(1);
-  const messagesPerPage = 5;
+  const messagesPerPage = 8;
 
   const [orders, setOrders] = useState([]);
   const [editingOrder, setEditingOrder] = useState(null);
   const [currentPageOrders, setCurrentPageOrders] = useState(1);
-  const ordersPerPage = 5;
+  const ordersPerPage = 8;
 
   const [currentPageUsers, setCurrentPageUsers] = useState(1);
-  const usersPerPage = 5;
+  const usersPerPage = 8;
   const [orderSortOption, setOrderSortOption] = useState(""); // "" | "priceAsc" | "priceDesc" | "dateAsc" | "dateDesc"
   const [userSortOption, setUserSortOption] = useState(""); // "" | "admin" | "user"
   const [messageSortOption, setMessageSortOption] = useState(""); // "" | "newest" | "oldest"
@@ -370,7 +370,7 @@ function Dashboard() {
       await axios.put(
         `http://localhost:8800/api/orders/${editingOrder.id}`,
         {
-          status: editingOrder.status,
+          status: editingOrder.status.toLowerCase(),
           orderDate: editingOrder.orderDate,
         },
         { withCredentials: true }
@@ -417,11 +417,11 @@ function Dashboard() {
           Analysis
         </button>
         <button
-  className={`sidebar-btn ${activeSection === "reports" ? "active" : ""}`}
-  onClick={() => setActiveSection("reports")}
->
-  Raporte
-</button>
+          className={`sidebar-btn ${activeSection === "reports" ? "active" : ""}`}
+          onClick={() => setActiveSection("reports")}
+        >
+          Raporte
+        </button>
 
         <a className={`sidebar-btn`} href="/post">Agents</a>
       </aside>
@@ -488,37 +488,37 @@ function Dashboard() {
               className="search-input"
             />
             <div className="filter-export-container">
-  <div>
-    <label htmlFor="userSortSelect"><strong>Filtro sipas rolit: </strong></label>
-    <select
-      id="userSortSelect"
-      value={userSortOption}
-      onChange={(e) => setUserSortOption(e.target.value)}
-    >
-      <option value="">Të gjithë</option>
-      <option value="admin">Vetëm ADMIN</option>
-      <option value="user">Vetëm USER</option>
-    </select>
-  </div>
+              <div>
+                <label htmlFor="userSortSelect"><strong>Filtro sipas rolit: </strong></label>
+                <select
+                  id="userSortSelect"
+                  value={userSortOption}
+                  onChange={(e) => setUserSortOption(e.target.value)}
+                >
+                  <option value="">Të gjithë</option>
+                  <option value="admin">Vetëm ADMIN</option>
+                  <option value="user">Vetëm USER</option>
+                </select>
+              </div>
 
-  <div>
-    <label htmlFor="exportUsers"><strong>Eksporto: </strong></label>
-    <select
-      id="exportUsers"
-      value={exportFormatUsers}
-      onChange={(e) => {
-        const selectedFormat = e.target.value;
-        setExportFormatUsers(selectedFormat);
-        if (selectedFormat) exportData(users, selectedFormat, "Users");
-      }}
-    >
-      <option value="">Zgjedh formatin</option>
-      <option value="json">JSON</option>
-      <option value="csv">CSV</option>
-      <option value="excel">Excel</option>
-    </select>
-  </div>
-</div>
+              <div>
+                <label htmlFor="exportUsers"><strong>Eksporto: </strong></label>
+                <select
+                  id="exportUsers"
+                  value={exportFormatUsers}
+                  onChange={(e) => {
+                    const selectedFormat = e.target.value;
+                    setExportFormatUsers(selectedFormat);
+                    if (selectedFormat) exportData(users, selectedFormat, "Users");
+                  }}
+                >
+                  <option value="">Zgjedh formatin</option>
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
+                  <option value="excel">Excel</option>
+                </select>
+              </div>
+            </div>
 
 
             <table className="user-table">
@@ -598,40 +598,40 @@ function Dashboard() {
               onChange={(e) => setMessageSearch(e.target.value)}
               className="search-input"
             />
-           <div className="filter-export-container">
-  <div>
-    <label htmlFor="messageSortOption"><strong>Filtro sipas: </strong></label>
-    <select
-      id="messageSortOption"
-      value={messageSortOption}
-      onChange={(e) => setMessageSortOption(e.target.value)}
-    >
-      <option value="">Pa filtër</option>
-      <option value="newest">Data (New → Old)</option>
-      <option value="oldest">Data (Old → New)</option>
-      <option value="gmail">Email (Gmail)</option>
-      <option value="outlook">Email (Outlook)</option>
-    </select>
-  </div>
+            <div className="filter-export-container">
+              <div>
+                <label htmlFor="messageSortOption"><strong>Filtro sipas: </strong></label>
+                <select
+                  id="messageSortOption"
+                  value={messageSortOption}
+                  onChange={(e) => setMessageSortOption(e.target.value)}
+                >
+                  <option value="">Pa filtër</option>
+                  <option value="newest">Data (New → Old)</option>
+                  <option value="oldest">Data (Old → New)</option>
+                  <option value="gmail">Email (Gmail)</option>
+                  <option value="outlook">Email (Outlook)</option>
+                </select>
+              </div>
 
-  <div>
-    <label htmlFor="exportMessages"><strong>Eksporto: </strong></label>
-    <select
-      id="exportMessages"
-      value={exportFormatMessages}
-      onChange={(e) => {
-        const selectedFormat = e.target.value;
-        setExportFormatMessages(selectedFormat);
-        if (selectedFormat) exportData(messages, selectedFormat, "Messages");
-      }}
-    >
-      <option value="">Zgjedh formatin</option>
-      <option value="json">JSON</option>
-      <option value="csv">CSV</option>
-      <option value="excel">Excel</option>
-    </select>
-  </div>
-</div>
+              <div>
+                <label htmlFor="exportMessages"><strong>Eksporto: </strong></label>
+                <select
+                  id="exportMessages"
+                  value={exportFormatMessages}
+                  onChange={(e) => {
+                    const selectedFormat = e.target.value;
+                    setExportFormatMessages(selectedFormat);
+                    if (selectedFormat) exportData(messages, selectedFormat, "Messages");
+                  }}
+                >
+                  <option value="">Zgjedh formatin</option>
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
+                  <option value="excel">Excel</option>
+                </select>
+              </div>
+            </div>
 
 
             <table className="user-table">
@@ -691,40 +691,40 @@ function Dashboard() {
               onChange={(e) => setOrderSearch(e.target.value)}
               className="search-input"
             />
-          <div className="filter-export-container">
-  <div>
-    <label htmlFor="orderSortSelect"><strong>Filtro sipas: </strong></label>
-    <select
-      id="orderSortSelect"
-      value={orderSortOption}
-      onChange={(e) => setOrderSortOption(e.target.value)}
-    >
-      <option value="">Pa filtër</option>
-      <option value="priceAsc">Çmimi (Low → High)</option>
-      <option value="priceDesc">Çmimi (High → Low)</option>
-      <option value="dateAsc">Data (Old → New)</option>
-      <option value="dateDesc">Data (New → Old)</option>
-    </select>
-  </div>
+            <div className="filter-export-container">
+              <div>
+                <label htmlFor="orderSortSelect"><strong>Filtro sipas: </strong></label>
+                <select
+                  id="orderSortSelect"
+                  value={orderSortOption}
+                  onChange={(e) => setOrderSortOption(e.target.value)}
+                >
+                  <option value="">Pa filtër</option>
+                  <option value="priceAsc">Çmimi (Low → High)</option>
+                  <option value="priceDesc">Çmimi (High → Low)</option>
+                  <option value="dateAsc">Data (Old → New)</option>
+                  <option value="dateDesc">Data (New → Old)</option>
+                </select>
+              </div>
 
-  <div>
-    <label htmlFor="exportOrders"><strong>Eksporto: </strong></label>
-    <select
-      id="exportOrders"
-      value={exportFormatOrders}
-      onChange={(e) => {
-        const selectedFormat = e.target.value;
-        setExportFormatOrders(selectedFormat);
-        if (selectedFormat) exportData(orders, selectedFormat, "Orders");
-      }}
-    >
-      <option value="">Zgjedh formatin</option>
-      <option value="json">JSON</option>
-      <option value="csv">CSV</option>
-      <option value="excel">Excel</option>
-    </select>
-  </div>
-</div>
+              <div>
+                <label htmlFor="exportOrders"><strong>Eksporto: </strong></label>
+                <select
+                  id="exportOrders"
+                  value={exportFormatOrders}
+                  onChange={(e) => {
+                    const selectedFormat = e.target.value;
+                    setExportFormatOrders(selectedFormat);
+                    if (selectedFormat) exportData(orders, selectedFormat, "Orders");
+                  }}
+                >
+                  <option value="">Zgjedh formatin</option>
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
+                  <option value="excel">Excel</option>
+                </select>
+              </div>
+            </div>
 
 
 
@@ -798,7 +798,7 @@ function Dashboard() {
             </div>
           </>
         )}
-{activeSection === "reports" && <ReportsSection users={users} messages={messages} orders={orders} />}
+        {activeSection === "reports" && <ReportsSection users={users} messages={messages} orders={orders} />}
 
         {/* MODAL: SHTO PËRDORUES */}
         {isAddModalOpen && (
@@ -883,11 +883,9 @@ function Dashboard() {
                 value={editingOrder.status}
                 onChange={(e) => setEditingOrder((prev) => ({ ...prev, status: e.target.value }))}
               >
-                <option value="Pending">Pending</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Canceled">Canceled</option>
+                <option value="pending">Pending</option>Add commentMore actions
+                <option value="completed">Completed</option>
+                <option value="canceled">Canceled</option>
               </select>
 
               <label>Data e porosisë:</label>

@@ -344,6 +344,8 @@ const handleSave = async (updatedPost) => {
     setIsEditModalOpen(false);
     setEditingPost(null);
     alert("Postimi u përditësua me sukses!");
+
+    
   } catch (err) {
     console.error(
       "Gabim gjatë përditësimit të postimit:",

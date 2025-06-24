@@ -42,9 +42,9 @@ function Card({ item }) {
             <span>{item.bathroom} bathroom</span>
           </div>
           <div className="icons">
-            <div className="icon">
+            {/* <div className="icon">
               <img src="/save.png" alt="" />
-            </div>
+            </div> */}
             {/* <div className="icon">
               <Link to={`/chat/${item.id}`}>
                 <img src="/chat.png" alt="" />

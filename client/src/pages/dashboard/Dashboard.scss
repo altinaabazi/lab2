@@ -351,6 +351,38 @@ body {
   background-color: #566574;
 }
 
+.order-filter-buttons button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.order-filter-buttons button:hover {
+  background: #ccc;
+}
+.filter-export-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin: 10px 0;
+}
+
+.filter-export-container select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #eee;
+}
+
+.filter-export-container select:hover {
+  background: #ffffff;
+}
+
+
 /* Responsive */
 
 @media (max-width: 900px) {

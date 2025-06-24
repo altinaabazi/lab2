@@ -5,7 +5,9 @@ import { Doughnut, Line, Bar } from "react-chartjs-2";
 import { AuthContext } from "../../context/AuthContext";
 import "./Dashboard.scss";
 import { Link } from "react-router-dom";
-
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import ReportsSection from "../report/ReportsSection";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -72,7 +74,7 @@ function Dashboard() {
   const [postsByCity, setPostsByCity] = useState([]);
 
 
-   const [userSearch, setUserSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [messageSearch, setMessageSearch] = useState("");
   const [orderSearch, setOrderSearch] = useState("");
 
@@ -92,6 +94,13 @@ function Dashboard() {
 
   const [currentPageUsers, setCurrentPageUsers] = useState(1);
   const usersPerPage = 5;
+  const [orderSortOption, setOrderSortOption] = useState(""); // "" | "priceAsc" | "priceDesc" | "dateAsc" | "dateDesc"
+  const [userSortOption, setUserSortOption] = useState(""); // "" | "admin" | "user"
+  const [messageSortOption, setMessageSortOption] = useState(""); // "" | "newest" | "oldest"
+  const [exportFormatOrders, setExportFormatOrders] = useState("");
+  const [exportFormatMessages, setExportFormatMessages] = useState("");
+  const [exportFormatUsers, setExportFormatUsers] = useState("");
+
 
   const [activeSection, setActiveSection] = useState("analytics");
 
@@ -109,7 +118,7 @@ function Dashboard() {
     fetchMessages();
     fetchOrders();
     fetchTotalPosts();
-     fetchPostsByCity();;
+    fetchPostsByCity();;
   }, [currentUser, navigate]);
 
   // Marrja e të dhënave
@@ -122,14 +131,14 @@ function Dashboard() {
     }
   };
   const fetchTotalPosts = async () => {
-  try {
-    const res = await axios.get("http://localhost:8800/api/posts/count", { withCredentials: true });
-    setTotalPosts(res.data.total);
-  } catch (err) {
-    console.error("Failed to fetch total posts:", err);
-  }
-};
- const fetchPostsByCity = async () => {
+    try {
+      const res = await axios.get("http://localhost:8800/api/posts/count", { withCredentials: true });
+      setTotalPosts(res.data.total);
+    } catch (err) {
+      console.error("Failed to fetch total posts:", err);
+    }
+  };
+  const fetchPostsByCity = async () => {
     try {
       const res = await axios.get("http://localhost:8800/api/posts/group-by-city", { withCredentials: true });
       setPostsByCity(res.data);
@@ -166,23 +175,86 @@ function Dashboard() {
   const currentOrders = orders.slice((currentPageOrders - 1) * ordersPerPage, currentPageOrders * ordersPerPage);
   const totalPagesOrders = Math.ceil(orders.length / ordersPerPage);
 
-   const filteredUsers = currentUsers.filter(user =>
-    user.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
-    user.role.toLowerCase().includes(userSearch.toLowerCase())
-  );
-   const filteredMessages = currentMessages.filter(msg =>
-    msg.name.toLowerCase().includes(messageSearch.toLowerCase()) ||
-    msg.lastname.toLowerCase().includes(messageSearch.toLowerCase()) ||
-    msg.email.toLowerCase().includes(messageSearch.toLowerCase()) ||
-    msg.message.toLowerCase().includes(messageSearch.toLowerCase())
-  );
+  const filteredUsers = currentUsers
+    .filter(user =>
+      user.username.toLowerCase().includes(userSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+      user.role.toLowerCase().includes(userSearch.toLowerCase())
+    )
+    .filter(user => {
+      if (userSortOption === "admin") return user.role === "ADMIN";
+      if (userSortOption === "user") return user.role === "USER";
+      return true;
+    });
 
-  const filteredOrders = currentOrders.filter(order =>
-    order.username?.toLowerCase().includes(orderSearch.toLowerCase()) ||
-    order.apartmentName?.toLowerCase().includes(orderSearch.toLowerCase()) ||
-    order.status?.toLowerCase().includes(orderSearch.toLowerCase())
-  );
+  const filteredMessages = currentMessages
+    .filter((msg) => {
+      if (messageSearch) {
+        return (
+          msg.name.toLowerCase().includes(messageSearch.toLowerCase()) ||
+          msg.lastname.toLowerCase().includes(messageSearch.toLowerCase()) ||
+          msg.email.toLowerCase().includes(messageSearch.toLowerCase()) ||
+          msg.message.toLowerCase().includes(messageSearch.toLowerCase())
+        );
+      }
+      return true;
+    })
+    .filter((msg) => {
+      if (messageSortOption === "gmail") return msg.email.includes("@gmail.com");
+      if (messageSortOption === "outlook") return msg.email.includes("@outlook.com");
+      return true;
+    })
+    .sort((a, b) => {
+      if (messageSortOption === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+      if (messageSortOption === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      return 0;
+    });
+
+
+  const filteredOrders = currentOrders
+    .filter(order =>
+      order.username?.toLowerCase().includes(orderSearch.toLowerCase()) ||
+      order.apartmentName?.toLowerCase().includes(orderSearch.toLowerCase()) ||
+      order.status?.toLowerCase().includes(orderSearch.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (orderSortOption === "priceAsc") {
+        return (a.apartmentPrice || 0) - (b.apartmentPrice || 0);
+      } else if (orderSortOption === "priceDesc") {
+        return (b.apartmentPrice || 0) - (a.apartmentPrice || 0);
+      } else if (orderSortOption === "dateAsc") {
+        return new Date(a.orderDate) - new Date(b.orderDate);
+      } else if (orderSortOption === "dateDesc") {
+        return new Date(b.orderDate) - new Date(a.orderDate);
+      }
+      return 0; // pa ndryshim
+    });
+
+  //exporti
+
+
+  const exportData = (data, format, fileName) => {
+    if (format === "json") {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      saveAs(blob, `${fileName}.json`);
+    } else if (format === "csv" || format === "excel") {
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+      const fileType = format === "csv" ? "csv" : "xlsx";
+      const fileExtension = format === "csv" ? ".csv" : ".xlsx";
+
+      const excelBuffer = XLSX.write(workbook, { bookType: fileType, type: "array" });
+      const blob = new Blob([excelBuffer], {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+
+      saveAs(blob, `${fileName}${fileExtension}`);
+    }
+  };
+
   // Statistikat e roleve
   const roleCounts = users.reduce((acc, user) => {
     acc[user.role] = (acc[user.role] || 0) + 1;
@@ -317,9 +389,9 @@ function Dashboard() {
       {/* Sidebar */}
       <aside className="sidebar">
         <h2>Menaxhimi</h2>
-         <div>
-  <Link className="button-add" to="/add">New Post</Link>
-</div>
+        <div>
+          <Link className="button-add" to="/add">New Post</Link>
+        </div>
         <button
           className={`sidebar-btn ${activeSection === "users" ? "active" : ""}`}
           onClick={() => setActiveSection("users")}
@@ -344,6 +416,13 @@ function Dashboard() {
         >
           Analysis
         </button>
+        <button
+  className={`sidebar-btn ${activeSection === "reports" ? "active" : ""}`}
+  onClick={() => setActiveSection("reports")}
+>
+  Raporte
+</button>
+
         <a className={`sidebar-btn`} href="/post">Agents</a>
       </aside>
 
@@ -368,10 +447,10 @@ function Dashboard() {
                 <h4>👥User</h4>
                 <p>{users.filter((u) => u.role === "USER").length}</p>
               </div>
-               <div className="stat-card">
-        <h4>Total Apartments</h4>
-        <p>{totalPosts}</p>
-      </div>
+              <div className="stat-card">
+                <h4>Total Apartments</h4>
+                <p>{totalPosts}</p>
+              </div>
             </div>
 
             <div className="charts">
@@ -387,7 +466,7 @@ function Dashboard() {
                 <h3>Total roles</h3>
                 <Bar data={barData} />
               </div> */}
-                <div className="chart-card">
+              <div className="chart-card">
                 <h3>Posts by City</h3>
                 <Bar data={cityBarData} />
               </div>
@@ -401,13 +480,46 @@ function Dashboard() {
             <button className="add-link" onClick={() => setIsAddModalOpen(true)}>
               Shto përdorues
             </button>
-             <input
+            <input
               type="text"
               placeholder="Kërko përdorues..."
               value={userSearch}
               onChange={(e) => setUserSearch(e.target.value)}
               className="search-input"
             />
+            <div className="filter-export-container">
+  <div>
+    <label htmlFor="userSortSelect"><strong>Filtro sipas rolit: </strong></label>
+    <select
+      id="userSortSelect"
+      value={userSortOption}
+      onChange={(e) => setUserSortOption(e.target.value)}
+    >
+      <option value="">Të gjithë</option>
+      <option value="admin">Vetëm ADMIN</option>
+      <option value="user">Vetëm USER</option>
+    </select>
+  </div>
+
+  <div>
+    <label htmlFor="exportUsers"><strong>Eksporto: </strong></label>
+    <select
+      id="exportUsers"
+      value={exportFormatUsers}
+      onChange={(e) => {
+        const selectedFormat = e.target.value;
+        setExportFormatUsers(selectedFormat);
+        if (selectedFormat) exportData(users, selectedFormat, "Users");
+      }}
+    >
+      <option value="">Zgjedh formatin</option>
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="excel">Excel</option>
+    </select>
+  </div>
+</div>
+
 
             <table className="user-table">
               <thead>
@@ -420,7 +532,7 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                 {filteredUsers.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>{user.id}</td>
                     <td>{user.username}</td>
@@ -436,7 +548,7 @@ function Dashboard() {
                         Edito
                       </button>{" "}
                       <button
-                      className="delete-btn"
+                        className="delete-btn"
                         onClick={() => {
                           if (window.confirm("A je i sigurt që dëshiron të fshish këtë përdorues?")) {
                             axios
@@ -479,13 +591,49 @@ function Dashboard() {
         {activeSection === "messages" && (
           <>
             <h2>Mesazhet</h2>
-             <input
+            <input
               type="text"
               placeholder="Kërko mesazhe..."
               value={messageSearch}
               onChange={(e) => setMessageSearch(e.target.value)}
               className="search-input"
             />
+           <div className="filter-export-container">
+  <div>
+    <label htmlFor="messageSortOption"><strong>Filtro sipas: </strong></label>
+    <select
+      id="messageSortOption"
+      value={messageSortOption}
+      onChange={(e) => setMessageSortOption(e.target.value)}
+    >
+      <option value="">Pa filtër</option>
+      <option value="newest">Data (New → Old)</option>
+      <option value="oldest">Data (Old → New)</option>
+      <option value="gmail">Email (Gmail)</option>
+      <option value="outlook">Email (Outlook)</option>
+    </select>
+  </div>
+
+  <div>
+    <label htmlFor="exportMessages"><strong>Eksporto: </strong></label>
+    <select
+      id="exportMessages"
+      value={exportFormatMessages}
+      onChange={(e) => {
+        const selectedFormat = e.target.value;
+        setExportFormatMessages(selectedFormat);
+        if (selectedFormat) exportData(messages, selectedFormat, "Messages");
+      }}
+    >
+      <option value="">Zgjedh formatin</option>
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="excel">Excel</option>
+    </select>
+  </div>
+</div>
+
+
             <table className="user-table">
               <thead>
                 <tr>
@@ -536,13 +684,50 @@ function Dashboard() {
         {activeSection === "orders" && (
           <>
             <h2>Porositë</h2>
-             <input
+            <input
               type="text"
               placeholder="Kërko porosi..."
               value={orderSearch}
               onChange={(e) => setOrderSearch(e.target.value)}
               className="search-input"
             />
+          <div className="filter-export-container">
+  <div>
+    <label htmlFor="orderSortSelect"><strong>Filtro sipas: </strong></label>
+    <select
+      id="orderSortSelect"
+      value={orderSortOption}
+      onChange={(e) => setOrderSortOption(e.target.value)}
+    >
+      <option value="">Pa filtër</option>
+      <option value="priceAsc">Çmimi (Low → High)</option>
+      <option value="priceDesc">Çmimi (High → Low)</option>
+      <option value="dateAsc">Data (Old → New)</option>
+      <option value="dateDesc">Data (New → Old)</option>
+    </select>
+  </div>
+
+  <div>
+    <label htmlFor="exportOrders"><strong>Eksporto: </strong></label>
+    <select
+      id="exportOrders"
+      value={exportFormatOrders}
+      onChange={(e) => {
+        const selectedFormat = e.target.value;
+        setExportFormatOrders(selectedFormat);
+        if (selectedFormat) exportData(orders, selectedFormat, "Orders");
+      }}
+    >
+      <option value="">Zgjedh formatin</option>
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="excel">Excel</option>
+    </select>
+  </div>
+</div>
+
+
+
             <table className="user-table">
               <thead>
                 <tr>
@@ -556,7 +741,7 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                 {filteredOrders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id}>
                     <td>{order.id}</td>
                     <td>{order.username || order.userId}</td>
@@ -566,7 +751,7 @@ function Dashboard() {
                     <td>{order.status || "N/A"}</td>
                     <td>
                       <button
-                       className="edit-btn"
+                        className="edit-btn"
                         onClick={() => {
                           setEditingOrder(order);
                           setIsEditOrderModalOpen(true);
@@ -575,7 +760,7 @@ function Dashboard() {
                         Edito
                       </button>{" "}
                       <button
-                       className="delete-btn"
+                        className="delete-btn"
                         onClick={() => {
                           if (window.confirm("A je i sigurt që dëshiron të fshish këtë porosi?")) {
                             axios
@@ -613,6 +798,7 @@ function Dashboard() {
             </div>
           </>
         )}
+{activeSection === "reports" && <ReportsSection users={users} messages={messages} orders={orders} />}
 
         {/* MODAL: SHTO PËRDORUES */}
         {isAddModalOpen && (

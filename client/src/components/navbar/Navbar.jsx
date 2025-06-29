@@ -109,8 +109,8 @@ function Navbar() {
           <span>PlacePoint</span>
         </a>
         <a href="/">Home</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
         {currentUser?.role === "ADMIN" ? (
           <Link to="/dashboard">Dashboard</Link>
         ) : (

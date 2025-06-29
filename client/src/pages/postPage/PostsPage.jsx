@@ -1,93 +1,14 @@
-// import React, { useEffect, useState, useContext } from "react";
-// import axios from "axios";
-// import Card from "../../components/card/Card";
-// import { AuthContext } from "../../context/AuthContext"; // Nëse e ke nevo
-
-// import "./postsPages.scss";
-
-// function PostPage() {
-//   const [posts, setPosts] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-
-//   // Merr postimet nga backend duke përfshirë cookie-n me token
-//   const fetchPosts = async () => {
-//     setLoading(true);
-//     setError("");
-//     try {
-//       const res = await axios.get("http://localhost:8800/api/posts", {
-//         withCredentials: true, // Kjo është çelësi: dërgon cookie me kërkesën
-//       });
-//       setPosts(res.data);
-//     } catch (err) {
-//       setError("Nuk jeni të autorizuar për të parë postimet");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchPosts();
-//   }, []);
-
-//   // Funksion për fshirjen e postit
-//   const handleDelete = async (id) => {
-//   try {
-//     const token = localStorage.getItem("accessToken"); // ose merr nga context nëse e ruan atje
-
-//     await axios.delete(`http://localhost:8800/api/posts/${id}`, {
-//       withCredentials: true, // nëse përdor cookie për token
-//       headers: {
-//         Authorization: `Bearer ${token}`, // shto këtë nëse backend e kërkon në header
-//       },
-//     });
-
-//     setPosts(posts.filter((post) => post.id !== id));
-//     alert("Postimi u fshi me sukses!");
-//   } catch (err) {
-//     console.error("Gabim gjatë fshirjes së postimit:", err.response?.data || err.message);
-//     alert("Gabim gjatë fshirjes së postimit");
-//   }
-// };
-
-
-
-//   return (
-//     <div className="post-page">
-//   <h1>PlacePoint</h1>
-//   <button onClick={fetchPosts} className="refresh-btn">
-//     Rifresko listën
-//   </button>
-
-//   {loading && <p className="status-message loading">Duke ngarkuar postimet...</p>}
-//   {error && <p className="status-message error">{error}</p>}
-
-//   <div className="posts-grid">
-//     {posts.map((post) => (
-//       <div key={post.id} className="post-wrapper">
-//         <Card item={post} />
-//         <button className="delete-btn" onClick={() => handleDelete(post.id)}>
-//           Fshi
-//         </button>
-//       </div>
-//     ))}
-//   </div>
-// </div>
-
-//   );
-// }
-
-// export default PostPage;
 
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Card from "../../components/card/Card";
 import { AuthContext } from "../../context/AuthContext";
-
+import CustomAlertModal from "../../components/customAlertModal/CustomAlertModal";
 import "./postsPages.scss";
 
 function EditPostModal({ post, isOpen, onClose, onSave }) {
   const [editedPost, setEditedPost] = useState({});
+
 
   useEffect(() => {
     if (post) {
@@ -134,26 +55,26 @@ function EditPostModal({ post, isOpen, onClose, onSave }) {
             }
 
             // Nëse është datë
-           if (
-  value &&
-  typeof value === "string" &&
-  !isNaN(Date.parse(value)) &&
-  key.toLowerCase() !== "latitude" &&  // përjashto këto fushat
-  key.toLowerCase() !== "longitude"
-) {
-  return (
-    <label key={key}>
-      {key.charAt(0).toUpperCase() + key.slice(1)}:
-      <input
-        type="date"
-        name={key}
-        value={value.substring(0, 10)}
-        onChange={handleChange}
-        required
-      />
-    </label>
-  );
-}
+            if (
+              value &&
+              typeof value === "string" &&
+              !isNaN(Date.parse(value)) &&
+              key.toLowerCase() !== "latitude" &&  // përjashto këto fushat
+              key.toLowerCase() !== "longitude"
+            ) {
+              return (
+                <label key={key}>
+                  {key.charAt(0).toUpperCase() + key.slice(1)}:
+                  <input
+                    type="date"
+                    name={key}
+                    value={value.substring(0, 10)}
+                    onChange={handleChange}
+                    required
+                  />
+                </label>
+              );
+            }
 
             // Nëse është string me gjatësi të madhe, përdor textarea
             if (typeof value === "string" && value.length > 50) {
@@ -249,6 +170,8 @@ function PostPage() {
   const [error, setError] = useState("");
   const [editingPost, setEditingPost] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [alert, setAlert] = useState({ message: "", type: "success" });
+  const [postIdToDelete, setPostIdToDelete] = useState(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -281,10 +204,11 @@ function PostPage() {
       });
 
       setPosts(posts.filter((post) => post.id !== id));
-      alert("Postimi u fshi me sukses!");
+      setAlert({ message: "Postimi u fshi me sukses!", type: "success" });
+
     } catch (err) {
       console.error("Gabim gjatë fshirjes së postimit:", err.response?.data || err.message);
-      alert("Gabim gjatë fshirjes së postimit");
+      setAlert({ message: "Gabim gjatë fshirjes së postimit", type: "error" });
     }
   };
 
@@ -294,26 +218,12 @@ function PostPage() {
     setIsEditModalOpen(true);
   };
 
-const handleSave = async (updatedPost) => {
-  try {
-    const token = localStorage.getItem("accessToken");
+  const handleSave = async (updatedPost) => {
+    try {
+      const token = localStorage.getItem("accessToken");
 
-    // Ndaj postin në pjesën kryesore dhe postDetail
-    const {
-      desc,
-      utilities,
-      pet,
-      income,
-      size,
-      school,
-      bus,
-      restaurant,
-      ...mainData
-    } = updatedPost;
-
-    const postToSend = {
-      ...mainData,
-      postDetail: {
+      // Ndaj postin në pjesën kryesore dhe postDetail
+      const {
         desc,
         utilities,
         pet,
@@ -321,39 +231,53 @@ const handleSave = async (updatedPost) => {
         size,
         school,
         bus,
-        restaurant
-      }
-    };
+        restaurant,
+        ...mainData
+      } = updatedPost;
 
-    const response = await axios.put(
-      `http://localhost:8800/api/posts/${editingPost.id}`,
-      postToSend,
-      {
-        withCredentials: true,
-        // headers: { Authorization: `Bearer ${token}` } // shto këtë nëse duhet
-      }
-    );
+      const postToSend = {
+        ...mainData,
+        postDetail: {
+          desc,
+          utilities,
+          pet,
+          income,
+          size,
+          school,
+          bus,
+          restaurant
+        }
+      };
 
-    const updatedPostFromBackend = response.data;
+      const response = await axios.put(
+        `http://localhost:8800/api/posts/${editingPost.id}`,
+        postToSend,
+        {
+          withCredentials: true,
+          // headers: { Authorization: `Bearer ${token}` } // shto këtë nëse duhet
+        }
+      );
 
-    const updatedPosts = posts.map((p) =>
-      p.id === updatedPostFromBackend.id ? updatedPostFromBackend : p
-    );
-    setPosts(updatedPosts);
+      const updatedPostFromBackend = response.data;
 
-    setIsEditModalOpen(false);
-    setEditingPost(null);
-    alert("Postimi u përditësua me sukses!");
+      const updatedPosts = posts.map((p) =>
+        p.id === updatedPostFromBackend.id ? updatedPostFromBackend : p
+      );
+      setPosts(updatedPosts);
 
-    
-  } catch (err) {
-    console.error(
-      "Gabim gjatë përditësimit të postimit:",
-      err.response?.data || err.message
-    );
-    alert("Gabim gjatë përditësimit të postimit");
-  }
-};
+      setIsEditModalOpen(false);
+      setEditingPost(null);
+      setAlert({ message: "Postimi u përditësua me sukses!", type: "success" });
+
+
+    } catch (err) {
+      console.error(
+        "Gabim gjatë përditësimit të postimit:",
+        err.response?.data || err.message
+      );
+      setAlert({ message: "Gabim gjatë përditësimit të postimit", type: "error" });
+    }
+  };
 
 
   return (
@@ -366,24 +290,25 @@ const handleSave = async (updatedPost) => {
       {loading && <p className="status-message loading">Duke ngarkuar postimet...</p>}
       {error && <p className="status-message error">{error}</p>}
 
-     <div className="posts-grid">
-  {posts.map((post) => (
-    <div key={post.id} className="post-wrapper">
-      <Card item={post} />
-      
-      {currentUser?.role === "ADMIN" && (
-        <>
-          <button className="delete-btn" onClick={() => handleDelete(post.id)}>
-            Delete
-          </button>
-           <button className="edit-btn" onClick={() => handleEditClick(post)}>
-            Edit
-          </button>
-        </>
-      )}
-    </div>
-  ))}
-</div>
+      <div className="posts-grid">
+        {posts.map((post) => (
+          <div key={post.id} className="post-wrapper">
+            <Card item={post} />
+
+            {currentUser?.role === "ADMIN" && (
+              <>
+                <button className="delete-btn" onClick={() => setPostIdToDelete(post.id)}>
+                  Delete
+                </button>
+
+                <button className="edit-btn" onClick={() => handleEditClick(post)}>
+                  Edit
+                </button>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
 
 
       <EditPostModal
@@ -392,7 +317,30 @@ const handleSave = async (updatedPost) => {
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSave}
       />
+      {/* Modal për konfirmim fshirje */}
+      {postIdToDelete !== null && (
+        <CustomAlertModal
+          message="A je i/e sigurt që dëshiron të fshish këtë postim?"
+          type="confirm"
+          onConfirm={() => {
+            handleDelete(postIdToDelete);
+            setPostIdToDelete(null);
+          }}
+          onClose={() => setPostIdToDelete(null)}
+        />
+      )}
+
+      {/* Modal për mesazh suksesi ose errori */}
+      {alert.message && (
+        <CustomAlertModal
+          message={alert.message}
+          type={alert.type}
+          onClose={() => setAlert({ message: "", type: "success" })}
+        />
+      )}
+
     </div>
+
   );
 }
 

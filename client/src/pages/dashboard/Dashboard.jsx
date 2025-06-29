@@ -22,7 +22,7 @@ import {
 } from "chart.js";
 import { io } from "socket.io-client";
 import AuditLogTable from "../auditLogs/AuditLogTable";
-
+import CustomAlertModal from "../../components/customAlertModal/CustomAlertModal";
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -71,7 +71,7 @@ const socket = io("http://localhost:4000");
 
 function Dashboard() {
   const { currentUser } = useContext(AuthContext);
-   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const navigate = useNavigate();
 
   const [totalPosts, setTotalPosts] = useState(0);
@@ -112,6 +112,9 @@ function Dashboard() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success"); // "success" | "error" | "confirm"
+  const [confirmCallback, setConfirmCallback] = useState(null);
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "ADMIN") {
@@ -135,151 +138,151 @@ function Dashboard() {
     }
   };
 
-//  useEffect(() => {
-//   socket.on("connect", () => {
-//     console.log("✅ Socket connected:", socket.id);
-//   });
+  //  useEffect(() => {
+  //   socket.on("connect", () => {
+  //     console.log("✅ Socket connected:", socket.id);
+  //   });
 
-//   socket.on("disconnect", () => {
-//     console.log("❌ Socket disconnected");
-//   });
+  //   socket.on("disconnect", () => {
+  //     console.log("❌ Socket disconnected");
+  //   });
 
-//   socket.on("onlineUsers", (users) => {
-//     console.log("🟢 Online users received:", users);
-//     setOnlineUsers(users);
-//   });
+  //   socket.on("onlineUsers", (users) => {
+  //     console.log("🟢 Online users received:", users);
+  //     setOnlineUsers(users);
+  //   });
 
-//   return () => {
-//     socket.off("connect");
-//     socket.off("disconnect");
-//     socket.off("onlineUsers");
-//   };
-// }, []);
-useEffect(() => {
-  socket.on("connect", () => {
-    console.log("✅ Socket connected:", socket.id);
+  //   return () => {
+  //     socket.off("connect");
+  //     socket.off("disconnect");
+  //     socket.off("onlineUsers");
+  //   };
+  // }, []);
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("✅ Socket connected:", socket.id);
 
-    // Emit vetem kur socket lidhet dhe currentUser ekziston
-    if (currentUser) {
-      socket.emit("newUser", {
-        userId: currentUser._id || currentUser.id,
-        username: currentUser.username,
-      });
-    }
-  });
+      // Emit vetem kur socket lidhet dhe currentUser ekziston
+      if (currentUser) {
+        socket.emit("newUser", {
+          userId: currentUser._id || currentUser.id,
+          username: currentUser.username,
+        });
+      }
+    });
 
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected");
-  });
+    socket.on("disconnect", () => {
+      console.log("❌ Socket disconnected");
+    });
 
-  socket.on("onlineUsers", (users) => {
-    console.log("🟢 Online users received:", users);
-    setOnlineUsers(users);
-  });
+    socket.on("onlineUsers", (users) => {
+      console.log("🟢 Online users received:", users);
+      setOnlineUsers(users);
+    });
 
-  return () => {
-    socket.off("connect");
-    socket.off("disconnect");
-    socket.off("onlineUsers");
-  };
-}, []);
-// useEffect(() => {
-//     if (!currentUser) return;
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("onlineUsers");
+    };
+  }, []);
+  // useEffect(() => {
+  //     if (!currentUser) return;
 
-//     const handleConnect = () => {
-//       console.log("✅ Socket connected:", socket.id);
-//       socket.emit("newUser", {
-//         userId: currentUser._id || currentUser.id,
-//         username: currentUser.username,
-//       });
-//     };
+  //     const handleConnect = () => {
+  //       console.log("✅ Socket connected:", socket.id);
+  //       socket.emit("newUser", {
+  //         userId: currentUser._id || currentUser.id,
+  //         username: currentUser.username,
+  //       });
+  //     };
 
-//     socket.on("connect", handleConnect);
+  //     socket.on("connect", handleConnect);
 
-//     socket.on("disconnect", () => {
-//       console.log("❌ Socket disconnected");
-//     });
+  //     socket.on("disconnect", () => {
+  //       console.log("❌ Socket disconnected");
+  //     });
 
-//     socket.on("onlineUsers", (users) => {
-//       console.log("🟢 Online users received:", users);
-//       setOnlineUsers(users);
-//     });
+  //     socket.on("onlineUsers", (users) => {
+  //       console.log("🟢 Online users received:", users);
+  //       setOnlineUsers(users);
+  //     });
 
-//     // Emit nëse socket është veç i lidhur
-//     if (socket.connected) {
-//       handleConnect();
-//     }
+  //     // Emit nëse socket është veç i lidhur
+  //     if (socket.connected) {
+  //       handleConnect();
+  //     }
 
-//     return () => {
-//       socket.off("connect", handleConnect);
-//       socket.off("disconnect");
-//       socket.off("onlineUsers");
-//     };
-//   }, [currentUser]);
-// useEffect(() => {
-//   if (!currentUser) return;
+  //     return () => {
+  //       socket.off("connect", handleConnect);
+  //       socket.off("disconnect");
+  //       socket.off("onlineUsers");
+  //     };
+  //   }, [currentUser]);
+  // useEffect(() => {
+  //   if (!currentUser) return;
 
-//   const handleConnect = () => {
-//     console.log("✅ Socket connected:", socket.id);
-//     socket.emit("newUser", {
-//       userId: currentUser._id || currentUser.id,
-//       username: currentUser.username,
-//     });
-//   };
+  //   const handleConnect = () => {
+  //     console.log("✅ Socket connected:", socket.id);
+  //     socket.emit("newUser", {
+  //       userId: currentUser._id || currentUser.id,
+  //       username: currentUser.username,
+  //     });
+  //   };
 
-//   socket.on("connect", handleConnect);
+  //   socket.on("connect", handleConnect);
 
-//   socket.on("disconnect", () => {
-//     console.log("❌ Socket disconnected");
-//   });
+  //   socket.on("disconnect", () => {
+  //     console.log("❌ Socket disconnected");
+  //   });
 
-//   socket.on("onlineUsers", (users) => {
-//     console.log("🟢 Online users received:", users);
-//     setOnlineUsers(users); // kjo vjen nga props ose state
-//   });
+  //   socket.on("onlineUsers", (users) => {
+  //     console.log("🟢 Online users received:", users);
+  //     setOnlineUsers(users); // kjo vjen nga props ose state
+  //   });
 
-//   // Nëse socket është veç i lidhur
-//   if (socket.connected) {
-//     handleConnect();
-//   }
+  //   // Nëse socket është veç i lidhur
+  //   if (socket.connected) {
+  //     handleConnect();
+  //   }
 
-//   return () => {
-//     socket.off("connect", handleConnect);
-//     socket.off("disconnect");
-//     socket.off("onlineUsers");
-//   };
-// }, [currentUser]);
+  //   return () => {
+  //     socket.off("connect", handleConnect);
+  //     socket.off("disconnect");
+  //     socket.off("onlineUsers");
+  //   };
+  // }, [currentUser]);
 
 
- const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
+  const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
     const user = users.find((u) => u.id === onlineUser.userId || u._id === onlineUser.userId);
     return {
       ...onlineUser,
       username: user ? user.username : "Unknown",
     };
   });
-// const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
-//   const user = users.find(
-//     (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
-//   );
+  // const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
+  //   const user = users.find(
+  //     (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
+  //   );
 
-//   return {
-//     ...onlineUser,
-//     username: user?.username || "Unknown",
-//   };
-// });
+  //   return {
+  //     ...onlineUser,
+  //     username: user?.username || "Unknown",
+  //   };
+  // });
 
-// const onlineUsersWithNames = onlineUsers
-//   .filter((u) => u.userId) // ❗⛔️ hiq ata që nuk kanë ID
-//   .map((onlineUser) => {
-//     const user = users.find(
-//       (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
-//     );
-//     return {
-//       ...onlineUser,
-//       username: user?.username || "Unknown",
-//     };
-//   });
+  // const onlineUsersWithNames = onlineUsers
+  //   .filter((u) => u.userId) // ❗⛔️ hiq ata që nuk kanë ID
+  //   .map((onlineUser) => {
+  //     const user = users.find(
+  //       (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
+  //     );
+  //     return {
+  //       ...onlineUser,
+  //       username: user?.username || "Unknown",
+  //     };
+  //   });
 
   const fetchTotalPosts = async () => {
     try {
@@ -314,6 +317,26 @@ useEffect(() => {
     } catch (err) {
       console.error("Gabim gjatë marrjes së porosive:", err);
     }
+  };
+  //Modals for alert
+  const showAlert = (message, type = "success") => {
+    setAlertMessage(message);
+    setAlertType(type);
+  };
+
+  const showConfirm = (message, onConfirm) => {
+    setAlertMessage(message);
+    setAlertType("confirm");
+    setConfirmCallback(() => () => {
+      onConfirm();
+      closeModal();
+    });
+  };
+
+  const closeModal = () => {
+    setAlertMessage("");
+    setAlertType("success");
+    setConfirmCallback(null);
   };
 
   // Pagination
@@ -488,7 +511,7 @@ useEffect(() => {
       fetchUsers();
     } catch (err) {
       console.error("Gabim gjatë shtimit të përdoruesit:", err);
-      alert("Gabim gjatë shtimit të përdoruesit!");
+      showAlert("Gabim gjatë shtimit të përdoruesit!", "error");
     }
   };
 
@@ -508,9 +531,11 @@ useEffect(() => {
       setEditingUser(null);
       setIsEditUserModalOpen(false);
       fetchUsers();
+      showAlert("Përdoruesi u përditësua me sukses!", "success"); // 🟢 ALERT
+
     } catch (err) {
       console.error("Gabim gjatë editimit të përdoruesit:", err);
-      alert("Gabim gjatë editimit të përdoruesit!");
+      showAlert("Gabim gjatë editimit të përdoruesit!", "error");
     }
   };
 
@@ -529,9 +554,11 @@ useEffect(() => {
       setEditingOrder(null);
       setIsEditOrderModalOpen(false);
       fetchOrders();
+      showAlert("Porosia u përditësua me sukses!", "success"); // 🟢 ALERT
+
     } catch (err) {
       console.error("Gabim gjatë editimit të porosisë:", err);
-      alert("Gabim gjatë editimit të porosisë!");
+      showAlert("Gabim gjatë editimit të porosise!", "error");
     }
   };
 
@@ -550,7 +577,7 @@ useEffect(() => {
         >
           Users
         </button>
-         <button
+        <button
           className={`sidebar-btn ${activeSection === "onlineusers" ? "active" : ""}`}
           onClick={() => setActiveSection("onlineusers")}
         >
@@ -578,9 +605,9 @@ useEffect(() => {
           className={`sidebar-btn ${activeSection === "reports" ? "active" : ""}`}
           onClick={() => setActiveSection("reports")}
         >
-          Raporte
+          Raport
         </button>
-          <button
+        <button
           className={`sidebar-btn ${activeSection === "auditlog" ? "active" : ""}`}
           onClick={() => setActiveSection("auditlog")}
         >
@@ -592,14 +619,14 @@ useEffect(() => {
       {/* Content */}
       <main className="content">
         <h1>Dashboard</h1>
-         {activeSection === "auditlog" && (
+        {activeSection === "auditlog" && (
           <>
-         <AuditLogTable />
-</>
-         )}
+            <AuditLogTable />
+          </>
+        )}
 
-         
-     {/* {activeSection === "onlineusers" && (
+
+        {/* {activeSection === "onlineusers" && (
   <div className="online-users">
     <h3>Online Users:</h3>
 
@@ -625,35 +652,35 @@ useEffect(() => {
     )}
   </div>
 )} */}
-{activeSection === "onlineusers" && (
-  <div className="online-users">
-    <h3>Online Users:</h3>
+        {activeSection === "onlineusers" && (
+          <div className="online-users">
+            <h3>Online Users:</h3>
 
-    {onlineUsersWithNames.length > 0 ? (
-      <table>
-        <thead>
-          <tr>
-            <th>Emri</th>
-            <th>ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {onlineUsersWithNames.map((user) => (
-            <tr key={user.socketId}>
-              <td>
-                <span className="online-dot"></span> {/* pika jeshile */}
-                {user.username}
-              </td>
-              <td>{user.userId}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <p>All Offline.</p>
-    )}
-  </div>
-)}
+            {onlineUsersWithNames.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Emri</th>
+                    <th>ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {onlineUsersWithNames.map((user) => (
+                    <tr key={user.socketId}>
+                      <td>
+                        <span className="online-dot"></span> {/* pika jeshile */}
+                        {user.username}
+                      </td>
+                      <td>{user.userId}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>All Offline.</p>
+            )}
+          </div>
+        )}
 
 
 
@@ -776,12 +803,12 @@ useEffect(() => {
                       <button
                         className="delete-btn"
                         onClick={() => {
-                          if (window.confirm("A je i sigurt që dëshiron të fshish këtë përdorues?")) {
+                          showConfirm("A je i sigurt që dëshiron të fshish këtë përdorues?", () => {
                             axios
                               .delete(`http://localhost:8800/api/users/${user.id}`, { withCredentials: true })
                               .then(fetchUsers)
-                              .catch(console.error);
-                          }
+                              .catch(() => showAlert("Gabim gjatë fshirjes së përdoruesit!", "error"));
+                          });
                         }}
                       >
                         Fshij
@@ -988,16 +1015,17 @@ useEffect(() => {
                       <button
                         className="delete-btn"
                         onClick={() => {
-                          if (window.confirm("A je i sigurt që dëshiron të fshish këtë porosi?")) {
+                          showConfirm("A je i sigurt që dëshiron të fshish këtë porosi?", () => {
                             axios
                               .delete(`http://localhost:8800/api/orders/${order.id}`, { withCredentials: true })
                               .then(fetchOrders)
-                              .catch(console.error);
-                          }
+                              .catch(() => showAlert("Gabim gjatë fshirjes së porosisë!", "error"));
+                          });
                         }}
                       >
                         Fshij
                       </button>
+
                     </td>
                   </tr>
                 ))}
@@ -1129,6 +1157,14 @@ useEffect(() => {
           </Modal>
         )}
       </main>
+      <CustomAlertModal
+        message={alertMessage}
+        type={alertType}
+        onClose={closeModal}
+        onConfirm={confirmCallback}
+      />
+
+
     </div>
   );
 }

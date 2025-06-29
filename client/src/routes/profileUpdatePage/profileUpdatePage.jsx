@@ -4,13 +4,20 @@ import { AuthContext } from "../../context/AuthContext";
 import apiRequest from "../../lib/apiRequest";
 import { useNavigate } from "react-router-dom";
 import UploadWidget from "../../components/uploadWidget/UploadWidget";
-
+import CustomAlertModal from "../../components/customAlertModal/CustomAlertModal";
 function ProfileUpdatePage() {
   const { currentUser, updateUser } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [avatar, setAvatar] = useState([]);
-
   const navigate = useNavigate();
+
+  const [alert, setAlert] = useState({ message: "", type: "", onConfirm: null });
+  const showAlert = (message, type = "success", onConfirm = null) => {
+    setAlert({ message, type, onConfirm });
+  };
+  const closeAlert = () => {
+    setAlert({ message: "", type: "", onConfirm: null });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,14 +30,19 @@ function ProfileUpdatePage() {
         username,
         email,
         password,
-        avatar:avatar[0]
+        avatar: avatar[0],
       });
       updateUser(res.data);
-      navigate("/profile");
+      showAlert("Profili u përditësua me sukses!", "success", () => {
+        closeAlert();
+        navigate("/profile");
+      });
     } catch (err) {
       console.log(err);
-      setError(err.response.data.message);
+      const errMsg = err?.response?.data?.message || "Dështoi përditësimi!";
+      showAlert(errMsg, "error");
     }
+
   };
 
   return (
@@ -77,6 +89,13 @@ function ProfileUpdatePage() {
           setState={setAvatar}
         />
       </div>
+      <CustomAlertModal
+        message={alert.message}
+        type={alert.type}
+        onClose={closeAlert}
+        onConfirm={alert.onConfirm}
+      />
+
     </div>
   );
 }

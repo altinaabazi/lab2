@@ -228,11 +228,11 @@ import { jsPDF } from "jspdf";
 import "./order.scss";
 
 // stripe e altines
-// const stripePromise = loadStripe("pk_test_51RSfHDQtoJs1pwT7gpsoZfWYtjAyqX5s3pDBC2k5RR34r2CNzUBgnn8qKQwJWdyoDrudJVUEteyLBiq3yrbnILX900nvPVWJp5");
+ const stripePromise = loadStripe("pk_test_51RSfHDQtoJs1pwT7gpsoZfWYtjAyqX5s3pDBC2k5RR34r2CNzUBgnn8qKQwJWdyoDrudJVUEteyLBiq3yrbnILX900nvPVWJp5");
 
 
 //stripe e blendes
-const stripePromise = loadStripe("pk_test_51RVuwTE1C5TUC3cqE1LbZRb1DBpvficMSs7LqIbQKruaOnrpLZyhKiT7nKv3AwVhLYF1PDeR5QsqfOT20KNkV15C00iOT4oNts");
+//const stripePromise = loadStripe("pk_test_51RVuwTE1C5TUC3cqE1LbZRb1DBpvficMSs7LqIbQKruaOnrpLZyhKiT7nKv3AwVhLYF1PDeR5QsqfOT20KNkV15C00iOT4oNts");
 
 function generateInvoicePDF(orderDetails) {
   const doc = new jsPDF();

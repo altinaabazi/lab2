@@ -3,26 +3,45 @@ import List from "../../components/list/List";
 import "./profilePage.scss";
 import apiRequest from "../../lib/apiRequest";
 import { Await, Link, useLoaderData, useNavigate } from "react-router-dom";
-import { Suspense, useContext , useState} from "react";
+import { Suspense, useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import CustomAlertModal from "../../components/customAlertModal/CustomAlertModal";
 
 function ProfilePage() {
   const data = useLoaderData();
   const { updateUser, currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const [showMyList, setShowMyList] = useState(false);
   const [showSavedList, setShowSavedList] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
+  const [confirmCallback, setConfirmCallback] = useState(null);
 
-  const handleLogout = async () => {
+  const showAlert = (message, type = "success", onConfirm = null) => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setConfirmCallback(() => onConfirm);
+  };
+
+  const closeAlert = () => {
+    setAlertMessage("");
+    setAlertType("success");
+    setConfirmCallback(null);
+  };
+
+const handleLogout = () => {
+  showAlert("A jeni i sigurt që dëshironi të dilni?", "warning", async () => {
     try {
       await apiRequest.post("/auth/logout");
       updateUser(null);
       navigate("/");
     } catch (err) {
       console.log(err);
+      showAlert("Dështoi logout. Ju lutem provoni sërish.", "error");
     }
-  };
+  });
+};
+
 
   const toggleMyList = () => {
     setShowMyList(prev => !prev);
@@ -106,6 +125,13 @@ function ProfilePage() {
           </Suspense>
         </div>
       </div>
+      <CustomAlertModal
+        message={alertMessage}
+        type={alertType}
+        onClose={closeAlert}
+        onConfirm={confirmCallback}
+      />
+
     </div>
   );
 }

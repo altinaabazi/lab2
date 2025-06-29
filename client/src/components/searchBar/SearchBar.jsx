@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./searchBar.scss";
 import { Link } from "react-router-dom";
 
-const types = ["buy", "rent"];
+const types = ["buy", ];
 
 function SearchBar() {
   const [query, setQuery] = useState({

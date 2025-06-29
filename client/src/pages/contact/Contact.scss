@@ -1,25 +1,41 @@
 @import "../../responsive.scss";
 
-.contact {
+.contactSection {
   background-color: #ffffff;
   padding: 60px 20px;
 
-  .container {
-    max-width: 1200px;
+  .box {
+    max-width: 800px;
     margin: auto;
+    text-align: center;
 
     h2 {
-      font-size: 32px;
+      font-size: 36px;
+      color: #222;
       margin-bottom: 20px;
     }
 
     p {
       font-size: 18px;
       margin: 10px 0;
+      color: #555;
     }
 
     a {
       color: #0077cc;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
+  }
+
+  // Opsional: mesazhi për rolet tjera
+  p {
+    text-align: center;
+    color: #b00020;
+    font-weight: 500;
+    margin-top: 30px;
   }
 }

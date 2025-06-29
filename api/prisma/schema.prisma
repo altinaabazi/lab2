@@ -85,6 +85,7 @@ model User {
   savedPosts SavedPost[]
   chats      Chat[]      @relation(fields: [chatIDs], references: [id])
   chatIDs    String[]    @db.ObjectId
+  auditLogs  AuditLog[]
 }
 
 enum Role {
@@ -118,4 +119,14 @@ model ContactMessage {
   phone     String
   message   String
   createdAt DateTime @default(now())
+}
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  action    String
+  targetId  String?
+  message   String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
 }

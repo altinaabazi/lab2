@@ -24,19 +24,55 @@ export const getUser = async (req, res) => {
   }
 };
 
+// export const updateUser = async (req, res) => {
+//   const id = req.params.id;
+//   const tokenUserId = req.userId;
+//   const { password, avatar, ...inputs } = req.body;
+
+//  const requestingUser = await prisma.user.findUnique({
+//   where: { id: tokenUserId },
+// });
+
+// if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
+//   return res.status(403).json({ message: "Not Authorized!" });
+// }
+
+
+//   let updatedPassword = null;
+//   try {
+//     if (password) {
+//       updatedPassword = await bcrypt.hash(password, 10);
+//     }
+
+//     const updatedUser = await prisma.user.update({
+//       where: { id },
+//       data: {
+//         ...inputs,
+//         ...(updatedPassword && { password: updatedPassword }),
+//         ...(avatar && { avatar }),
+//       },
+//     });
+
+//     const { password: userPassword, ...rest } = updatedUser;
+
+//     res.status(200).json(rest);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to update users!" });
+//   }
+// };
 export const updateUser = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
   const { password, avatar, ...inputs } = req.body;
 
- const requestingUser = await prisma.user.findUnique({
-  where: { id: tokenUserId },
-});
+  const requestingUser = await prisma.user.findUnique({
+    where: { id: tokenUserId },
+  });
 
-if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
-  return res.status(403).json({ message: "Not Authorized!" });
-}
-
+  if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
+    return res.status(403).json({ message: "Not Authorized!" });
+  }
 
   let updatedPassword = null;
   try {
@@ -50,6 +86,16 @@ if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
         ...inputs,
         ...(updatedPassword && { password: updatedPassword }),
         ...(avatar && { avatar }),
+      },
+    });
+
+    // Regjistro audit log
+    await prisma.auditLog.create({
+      data: {
+        userId: tokenUserId,
+        action: "UPDATE_USER",
+        targetId: id,
+        message: `User ${tokenUserId} updated user ${id}`,
       },
     });
 
@@ -80,6 +126,29 @@ if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
 //     res.status(500).json({ message: "Failed to delete users!" });
 //   }
 // };
+// export const deleteUser = async (req, res) => {
+//   const id = req.params.id;
+//   const tokenUserId = req.userId;
+
+//   try {
+//     const requestingUser = await prisma.user.findUnique({
+//       where: { id: tokenUserId },
+//     });
+
+//     if (id !== tokenUserId && requestingUser.role !== "ADMIN") {
+//       return res.status(403).json({ message: "Not Authorized!" });
+//     }
+
+//     await prisma.user.delete({
+//       where: { id },
+//     });
+
+//     res.status(200).json({ message: "User deleted" });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Failed to delete user!" });
+//   }
+// };
 export const deleteUser = async (req, res) => {
   const id = req.params.id;
   const tokenUserId = req.userId;
@@ -95,6 +164,16 @@ export const deleteUser = async (req, res) => {
 
     await prisma.user.delete({
       where: { id },
+    });
+
+    // Regjistro audit log
+    await prisma.auditLog.create({
+      data: {
+        userId: tokenUserId,
+        action: "DELETE_USER",
+        targetId: id,
+        message: `User ${tokenUserId} deleted user ${id}`,
+      },
     });
 
     res.status(200).json({ message: "User deleted" });

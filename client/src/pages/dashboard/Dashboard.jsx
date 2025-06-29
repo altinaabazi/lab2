@@ -20,6 +20,8 @@ import {
   BarElement,
   Title,
 } from "chart.js";
+import { io } from "socket.io-client";
+import AuditLogTable from "../auditLogs/AuditLogTable";
 
 ChartJS.register(
   ArcElement,
@@ -65,9 +67,11 @@ function Modal({ children, onClose }) {
     </div>
   );
 }
+const socket = io("http://localhost:4000");
 
 function Dashboard() {
   const { currentUser } = useContext(AuthContext);
+   const [onlineUsers, setOnlineUsers] = useState([]);
   const navigate = useNavigate();
 
   const [totalPosts, setTotalPosts] = useState(0);
@@ -130,6 +134,153 @@ function Dashboard() {
       console.error("Failed to fetch users:", err);
     }
   };
+
+//  useEffect(() => {
+//   socket.on("connect", () => {
+//     console.log("✅ Socket connected:", socket.id);
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("❌ Socket disconnected");
+//   });
+
+//   socket.on("onlineUsers", (users) => {
+//     console.log("🟢 Online users received:", users);
+//     setOnlineUsers(users);
+//   });
+
+//   return () => {
+//     socket.off("connect");
+//     socket.off("disconnect");
+//     socket.off("onlineUsers");
+//   };
+// }, []);
+useEffect(() => {
+  socket.on("connect", () => {
+    console.log("✅ Socket connected:", socket.id);
+
+    // Emit vetem kur socket lidhet dhe currentUser ekziston
+    if (currentUser) {
+      socket.emit("newUser", {
+        userId: currentUser._id || currentUser.id,
+        username: currentUser.username,
+      });
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Socket disconnected");
+  });
+
+  socket.on("onlineUsers", (users) => {
+    console.log("🟢 Online users received:", users);
+    setOnlineUsers(users);
+  });
+
+  return () => {
+    socket.off("connect");
+    socket.off("disconnect");
+    socket.off("onlineUsers");
+  };
+}, []);
+// useEffect(() => {
+//     if (!currentUser) return;
+
+//     const handleConnect = () => {
+//       console.log("✅ Socket connected:", socket.id);
+//       socket.emit("newUser", {
+//         userId: currentUser._id || currentUser.id,
+//         username: currentUser.username,
+//       });
+//     };
+
+//     socket.on("connect", handleConnect);
+
+//     socket.on("disconnect", () => {
+//       console.log("❌ Socket disconnected");
+//     });
+
+//     socket.on("onlineUsers", (users) => {
+//       console.log("🟢 Online users received:", users);
+//       setOnlineUsers(users);
+//     });
+
+//     // Emit nëse socket është veç i lidhur
+//     if (socket.connected) {
+//       handleConnect();
+//     }
+
+//     return () => {
+//       socket.off("connect", handleConnect);
+//       socket.off("disconnect");
+//       socket.off("onlineUsers");
+//     };
+//   }, [currentUser]);
+// useEffect(() => {
+//   if (!currentUser) return;
+
+//   const handleConnect = () => {
+//     console.log("✅ Socket connected:", socket.id);
+//     socket.emit("newUser", {
+//       userId: currentUser._id || currentUser.id,
+//       username: currentUser.username,
+//     });
+//   };
+
+//   socket.on("connect", handleConnect);
+
+//   socket.on("disconnect", () => {
+//     console.log("❌ Socket disconnected");
+//   });
+
+//   socket.on("onlineUsers", (users) => {
+//     console.log("🟢 Online users received:", users);
+//     setOnlineUsers(users); // kjo vjen nga props ose state
+//   });
+
+//   // Nëse socket është veç i lidhur
+//   if (socket.connected) {
+//     handleConnect();
+//   }
+
+//   return () => {
+//     socket.off("connect", handleConnect);
+//     socket.off("disconnect");
+//     socket.off("onlineUsers");
+//   };
+// }, [currentUser]);
+
+
+ const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
+    const user = users.find((u) => u.id === onlineUser.userId || u._id === onlineUser.userId);
+    return {
+      ...onlineUser,
+      username: user ? user.username : "Unknown",
+    };
+  });
+// const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
+//   const user = users.find(
+//     (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
+//   );
+
+//   return {
+//     ...onlineUser,
+//     username: user?.username || "Unknown",
+//   };
+// });
+
+// const onlineUsersWithNames = onlineUsers
+//   .filter((u) => u.userId) // ❗⛔️ hiq ata që nuk kanë ID
+//   .map((onlineUser) => {
+//     const user = users.find(
+//       (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
+//     );
+//     return {
+//       ...onlineUser,
+//       username: user?.username || "Unknown",
+//     };
+//   });
+
   const fetchTotalPosts = async () => {
     try {
       const res = await axios.get("http://localhost:8800/api/posts/count", { withCredentials: true });
@@ -388,15 +539,22 @@ function Dashboard() {
     <div className="dashboard" style={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar */}
       <aside className="sidebar">
-        <h2>Menaxhimi</h2>
+        <h2>Manage</h2>
         <div>
           <Link className="button-add" to="/add">New Post</Link>
         </div>
+        <a className={`sidebar-btn`} href="/post">Agents</a>
         <button
           className={`sidebar-btn ${activeSection === "users" ? "active" : ""}`}
           onClick={() => setActiveSection("users")}
         >
           Users
+        </button>
+         <button
+          className={`sidebar-btn ${activeSection === "onlineusers" ? "active" : ""}`}
+          onClick={() => setActiveSection("onlineusers")}
+        >
+          Online Users
         </button>
         <button
           className={`sidebar-btn ${activeSection === "messages" ? "active" : ""}`}
@@ -422,13 +580,81 @@ function Dashboard() {
         >
           Raporte
         </button>
+          <button
+          className={`sidebar-btn ${activeSection === "auditlog" ? "active" : ""}`}
+          onClick={() => setActiveSection("auditlog")}
+        >
+          AuditLogs
+        </button>
 
-        <a className={`sidebar-btn`} href="/post">Agents</a>
       </aside>
 
       {/* Content */}
       <main className="content">
         <h1>Dashboard</h1>
+         {activeSection === "auditlog" && (
+          <>
+         <AuditLogTable />
+</>
+         )}
+
+         
+     {/* {activeSection === "onlineusers" && (
+  <div className="online-users">
+    <h3>Online Users:</h3>
+
+    {onlineUsersWithNames.length > 0 ? (
+      <table>
+        <thead>
+          <tr>
+            <th>Emri</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {onlineUsersWithNames.map((user) => (
+            <tr key={user.socketId}>
+              <td>{user.username}</td>
+              <td>{user.userId}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p>All Offline.</p>
+    )}
+  </div>
+)} */}
+{activeSection === "onlineusers" && (
+  <div className="online-users">
+    <h3>Online Users:</h3>
+
+    {onlineUsersWithNames.length > 0 ? (
+      <table>
+        <thead>
+          <tr>
+            <th>Emri</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {onlineUsersWithNames.map((user) => (
+            <tr key={user.socketId}>
+              <td>
+                <span className="online-dot"></span> {/* pika jeshile */}
+                {user.username}
+              </td>
+              <td>{user.userId}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p>All Offline.</p>
+    )}
+  </div>
+)}
+
 
 
         {/* ANALYTICS */}
@@ -478,31 +704,31 @@ function Dashboard() {
         {activeSection === "users" && (
           <>
             <button className="add-link" onClick={() => setIsAddModalOpen(true)}>
-              Shto përdorues
+              Add User
             </button>
             <input
               type="text"
-              placeholder="Kërko përdorues..."
+              placeholder="Search..."
               value={userSearch}
               onChange={(e) => setUserSearch(e.target.value)}
               className="search-input"
             />
             <div className="filter-export-container">
               <div>
-                <label htmlFor="userSortSelect"><strong>Filtro sipas rolit: </strong></label>
+                <label htmlFor="userSortSelect"><strong>Filter role </strong></label>
                 <select
                   id="userSortSelect"
                   value={userSortOption}
                   onChange={(e) => setUserSortOption(e.target.value)}
                 >
-                  <option value="">Të gjithë</option>
-                  <option value="admin">Vetëm ADMIN</option>
-                  <option value="user">Vetëm USER</option>
+                  <option value="">All</option>
+                  <option value="admin">ADMIN</option>
+                  <option value="user">USER</option>
                 </select>
               </div>
 
               <div>
-                <label htmlFor="exportUsers"><strong>Eksporto: </strong></label>
+                <label htmlFor="exportUsers"><strong>Eksport: </strong></label>
                 <select
                   id="exportUsers"
                   value={exportFormatUsers}
@@ -512,7 +738,7 @@ function Dashboard() {
                     if (selectedFormat) exportData(users, selectedFormat, "Users");
                   }}
                 >
-                  <option value="">Zgjedh formatin</option>
+                  <option value="">Choose format</option>
                   <option value="json">JSON</option>
                   <option value="csv">CSV</option>
                   <option value="excel">Excel</option>
@@ -590,23 +816,23 @@ function Dashboard() {
         {/* MESSAGES SECTION */}
         {activeSection === "messages" && (
           <>
-            <h2>Mesazhet</h2>
+            <h2>Messages</h2>
             <input
               type="text"
-              placeholder="Kërko mesazhe..."
+              placeholder="Search..."
               value={messageSearch}
               onChange={(e) => setMessageSearch(e.target.value)}
               className="search-input"
             />
             <div className="filter-export-container">
               <div>
-                <label htmlFor="messageSortOption"><strong>Filtro sipas: </strong></label>
+                <label htmlFor="messageSortOption"><strong>Filter: </strong></label>
                 <select
                   id="messageSortOption"
                   value={messageSortOption}
                   onChange={(e) => setMessageSortOption(e.target.value)}
                 >
-                  <option value="">Pa filtër</option>
+                  <option value="">No filter</option>
                   <option value="newest">Data (New → Old)</option>
                   <option value="oldest">Data (Old → New)</option>
                   <option value="gmail">Email (Gmail)</option>
@@ -615,7 +841,7 @@ function Dashboard() {
               </div>
 
               <div>
-                <label htmlFor="exportMessages"><strong>Eksporto: </strong></label>
+                <label htmlFor="exportMessages"><strong>Eksport: </strong></label>
                 <select
                   id="exportMessages"
                   value={exportFormatMessages}
@@ -625,7 +851,7 @@ function Dashboard() {
                     if (selectedFormat) exportData(messages, selectedFormat, "Messages");
                   }}
                 >
-                  <option value="">Zgjedh formatin</option>
+                  <option value="">Choose format</option>
                   <option value="json">JSON</option>
                   <option value="csv">CSV</option>
                   <option value="excel">Excel</option>
@@ -683,23 +909,23 @@ function Dashboard() {
         {/* ORDERS SECTION */}
         {activeSection === "orders" && (
           <>
-            <h2>Porositë</h2>
+            <h2>Orders</h2>
             <input
               type="text"
-              placeholder="Kërko porosi..."
+              placeholder="Search..."
               value={orderSearch}
               onChange={(e) => setOrderSearch(e.target.value)}
               className="search-input"
             />
             <div className="filter-export-container">
               <div>
-                <label htmlFor="orderSortSelect"><strong>Filtro sipas: </strong></label>
+                <label htmlFor="orderSortSelect"><strong>Filter: </strong></label>
                 <select
                   id="orderSortSelect"
                   value={orderSortOption}
                   onChange={(e) => setOrderSortOption(e.target.value)}
                 >
-                  <option value="">Pa filtër</option>
+                  <option value="">No filter</option>
                   <option value="priceAsc">Çmimi (Low → High)</option>
                   <option value="priceDesc">Çmimi (High → Low)</option>
                   <option value="dateAsc">Data (Old → New)</option>
@@ -708,7 +934,7 @@ function Dashboard() {
               </div>
 
               <div>
-                <label htmlFor="exportOrders"><strong>Eksporto: </strong></label>
+                <label htmlFor="exportOrders"><strong>Eksport: </strong></label>
                 <select
                   id="exportOrders"
                   value={exportFormatOrders}
@@ -718,7 +944,7 @@ function Dashboard() {
                     if (selectedFormat) exportData(orders, selectedFormat, "Orders");
                   }}
                 >
-                  <option value="">Zgjedh formatin</option>
+                  <option value="">Choose format</option>
                   <option value="json">JSON</option>
                   <option value="csv">CSV</option>
                   <option value="excel">Excel</option>
@@ -803,7 +1029,7 @@ function Dashboard() {
         {/* MODAL: SHTO PËRDORUES */}
         {isAddModalOpen && (
           <Modal onClose={() => setIsAddModalOpen(false)}>
-            <h3>Shto përdorues</h3>
+            <h3>Add User</h3>
             <form onSubmit={handleAddUser} className="add-user-form">
               <input
                 type="text"
@@ -844,7 +1070,7 @@ function Dashboard() {
         {/* MODAL: EDITO PËRDORUES */}
         {isEditUserModalOpen && editingUser && (
           <Modal onClose={() => setIsEditUserModalOpen(false)}>
-            <h3>Edito përdorues</h3>
+            <h3>Edit User</h3>
             <form onSubmit={handleEditUser} className="edit-user-form">
               <input
                 type="text"
@@ -876,7 +1102,7 @@ function Dashboard() {
         {/* MODAL: EDITO POROSI */}
         {isEditOrderModalOpen && editingOrder && (
           <Modal onClose={() => setIsEditOrderModalOpen(false)}>
-            <h3>Edito porosi</h3>
+            <h3>Edit Order</h3>
             <form onSubmit={handleEditOrder} className="edit-order-form">
               <label>Statusi:</label>
               <select

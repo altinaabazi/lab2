@@ -12,18 +12,19 @@ function Contact() {
   return (
     <section className="contactSection" id="contact">
       <div className="box">
-        <h2>Na kontakto</h2>
+        <h2>Contact Us</h2>
         <p>
-          Email: <a href="mailto:support@placepoint.com">support@placepoint.com</a>
+          Email:{" "}
+          <a href="mailto:support@placepoint.com">support@placepoint.com</a>
         </p>
-        <p>Telefon: +383 49 123 456</p>
-        <p>Adresa: Prishtinë, Kosovë</p>
+        <p>Phone: +383 49 123 456</p>
+        <p>Address: Pristina, Kosova</p>
       </div>
 
       {canSeeForm ? (
         <ContactForm />
       ) : (
-        <p>Vetëm përdoruesit standard mund të dërgojnë mesazh.</p>
+        <p>Only standard users are allowed to send messages.</p>
       )}
     </section>
   );

@@ -115,7 +115,6 @@ function Dashboard() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success"); // "success" | "error" | "confirm"
   const [confirmCallback, setConfirmCallback] = useState(null);
-
   useEffect(() => {
     if (!currentUser || currentUser.role !== "ADMIN") {
       navigate("/");
@@ -531,11 +530,11 @@ function Dashboard() {
       setEditingUser(null);
       setIsEditUserModalOpen(false);
       fetchUsers();
-      showAlert("Përdoruesi u përditësua me sukses!", "success"); // 🟢 ALERT
+      showAlert("User updated successfully!", "success"); // 🟢 ALERT
 
     } catch (err) {
-      console.error("Gabim gjatë editimit të përdoruesit:", err);
-      showAlert("Gabim gjatë editimit të përdoruesit!", "error");
+      console.error(" Error while editing the user:", err);
+      showAlert("Error while editing the user:!", "error");
     }
   };
 
@@ -554,11 +553,11 @@ function Dashboard() {
       setEditingOrder(null);
       setIsEditOrderModalOpen(false);
       fetchOrders();
-      showAlert("Porosia u përditësua me sukses!", "success"); // 🟢 ALERT
+      showAlert("Order updated successfully!", "success"); // 🟢 ALERT
 
     } catch (err) {
-      console.error("Gabim gjatë editimit të porosisë:", err);
-      showAlert("Gabim gjatë editimit të porosise!", "error");
+      console.error("Error while editing the order:", err);
+      showAlert("Error while editing the order:!", "error");
     }
   };
 
@@ -798,20 +797,20 @@ function Dashboard() {
                           setIsEditUserModalOpen(true);
                         }}
                       >
-                        Edito
+                        Edit
                       </button>{" "}
                       <button
                         className="delete-btn"
                         onClick={() => {
-                          showConfirm("A je i sigurt që dëshiron të fshish këtë përdorues?", () => {
+                          showConfirm("Are you sure you want to delete this user?", () => {
                             axios
                               .delete(`http://localhost:8800/api/users/${user.id}`, { withCredentials: true })
                               .then(fetchUsers)
-                              .catch(() => showAlert("Gabim gjatë fshirjes së përdoruesit!", "error"));
+                              .catch(() => showAlert("Failed to delete the user!", "error"));
                           });
                         }}
                       >
-                        Fshij
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -1010,20 +1009,20 @@ function Dashboard() {
                           setIsEditOrderModalOpen(true);
                         }}
                       >
-                        Edito
+                        Edit
                       </button>{" "}
                       <button
                         className="delete-btn"
                         onClick={() => {
-                          showConfirm("A je i sigurt që dëshiron të fshish këtë porosi?", () => {
+                          showConfirm("Are you sure you want to delete this order?", () => {
                             axios
                               .delete(`http://localhost:8800/api/orders/${order.id}`, { withCredentials: true })
                               .then(fetchOrders)
-                              .catch(() => showAlert("Gabim gjatë fshirjes së porosisë!", "error"));
+                              .catch(() => showAlert("Failed to delete the order!", "error"));
                           });
                         }}
                       >
-                        Fshij
+                        Delete
                       </button>
 
                     </td>
@@ -1087,9 +1086,9 @@ function Dashboard() {
                 <option value="USER">USER</option>
                 <option value="ADMIN">ADMIN</option>
               </select>
-              <button type="submit">Shto</button>
+              <button type="submit">Add</button>
               <button type="button" onClick={() => setIsAddModalOpen(false)}>
-                Anulo
+                Cancel
               </button>
             </form>
           </Modal>
@@ -1119,9 +1118,9 @@ function Dashboard() {
                 <option value="USER">USER</option>
                 <option value="ADMIN">ADMIN</option>
               </select>
-              <button type="submit">Ruaj</button>
+              <button type="submit">Save</button>
               <button type="button" onClick={() => setIsEditUserModalOpen(false)}>
-                Anulo
+                Cancel
               </button>
             </form>
           </Modal>
@@ -1149,9 +1148,9 @@ function Dashboard() {
                 onChange={(e) => setEditingOrder((prev) => ({ ...prev, orderDate: e.target.value }))}
               />
 
-              <button type="submit">Ruaj</button>
+              <button type="submit">Save</button>
               <button type="button" onClick={() => setIsEditOrderModalOpen(false)}>
-                Anulo
+                Cancel
               </button>
             </form>
           </Modal>

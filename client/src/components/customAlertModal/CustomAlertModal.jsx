@@ -11,13 +11,13 @@ function CustomAlertModal({ message, type = "success", onClose, onConfirm }) {
 
      {type === "confirm" ? (
   <div className="buttons">
-    <button className="confirm" onClick={onConfirm}>Po, fshije</button>
-    <button className="cancel" onClick={onClose}>Anulo</button>
+    <button className="confirm" onClick={onConfirm}>Confirm</button>
+    <button className="cancel" onClick={onClose}>Cancel</button>
   </div>
 ) : type === "warning" && onConfirm ? (
   <div className="buttons">
-    <button onClick={onConfirm}>Po</button>
-    <button onClick={onClose}>Jo</button>
+    <button onClick={onConfirm}>Yes</button>
+    <button onClick={onClose}  style={{ backgroundColor: "gray", color: "white", }}>No</button>
   </div>
 ) : (
   <button onClick={onClose}>OK</button>

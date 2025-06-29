@@ -30,7 +30,7 @@ function ProfilePage() {
   };
 
 const handleLogout = () => {
-  showAlert("A jeni i sigurt që dëshironi të dilni?", "warning", async () => {
+  showAlert("Are you sure you want to logout?", "warning", async () => {
     try {
       await apiRequest.post("/auth/logout");
       updateUser(null);

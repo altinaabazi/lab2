@@ -5,30 +5,40 @@ function About() {
     <div className="about">
       <div className="container">
         <div className="box">
-          <h1>Rreth PlacePoint</h1>
+          <h1>About PlacePoint</h1>
           <p>
-            <strong>PlacePoint</strong> është një platformë moderne për tregun e patundshmërive që ju
-            ndihmon të gjeni apartamentin ose shtëpinë e ëndrrave. Me mbi <strong>2000+ prona</strong> të listuara,
-            ne e bëjmë më të lehtë se kurrë për ju që të gjeni vendin e përsosur për të jetuar ose për të investuar.
+            <strong>PlacePoint</strong> is a modern real estate platform that
+            helps you find your dream apartment or house. With over{" "}
+            <strong>2000+ listings</strong>, we make it easier than ever for you
+            to find the perfect place to live or invest.
           </p>
         </div>
 
         <div className="box">
-          <h2>🚀 Çfarë ofrojmë</h2>
+          <h2>🚀 What We Offer</h2>
           <ul>
-            <li><span>🔍</span> Kërkim i avancuar për prona</li>
-            <li><span>🏠</span> Prona për shitje dhe me qira</li>
-            <li><span>📊</span> Statistikë dhe analiza të tregut</li>
-            <li><span>🛠️</span> Mbështetje nga agjentë të verifikuar</li>
+            <li>
+              <span>🔍</span> Advanced property search
+            </li>
+            <li>
+              <span>🏠</span> Properties for sale and rent
+            </li>
+            <li>
+              <span>📊</span> Market statistics and analysis
+            </li>
+            <li>
+              <span>🛠️</span> Support from verified agents
+            </li>
           </ul>
         </div>
 
         <div className="box">
-          <h2>💡 Vlerat tona</h2>
+          <h2>💡 Our Values</h2>
           <p>
-            Ne besojmë në <strong>transparencë</strong>, <strong>profesionalizëm</strong> dhe <strong>inovacion</strong>. Qëllimi ynë
-            është të sjellim zgjidhje të thjeshta dhe të sigurta për të gjithë
-            ata që kërkojnë një shtëpi apo duan të shesin pronën e tyre.
+            We believe in <strong>transparency</strong>,{" "}
+            <strong>professionalism</strong>, and <strong>innovation</strong>.
+            Our goal is to provide simple and secure solutions for everyone
+            looking to buy a home or sell their property.
           </p>
         </div>
       </div>

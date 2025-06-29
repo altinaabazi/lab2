@@ -149,13 +149,13 @@ function EditPostModal({ post, isOpen, onClose, onSave }) {
             );
           })}
 
-          <button type="submit">Ruaj Ndryshimet</button>
+          <button type="submit">Save</button>
           <button
             type="button"
             onClick={onClose}
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: "1px" }}
           >
-            Anulo
+            Cancel
           </button>
         </form>
       </div>
@@ -204,11 +204,11 @@ function PostPage() {
       });
 
       setPosts(posts.filter((post) => post.id !== id));
-      setAlert({ message: "Postimi u fshi me sukses!", type: "success" });
+      setAlert({ message: "Post deleted successfully!", type: "success" });
 
     } catch (err) {
-      console.error("Gabim gjatë fshirjes së postimit:", err.response?.data || err.message);
-      setAlert({ message: "Gabim gjatë fshirjes së postimit", type: "error" });
+      console.error("Error occurred while deleting the post:", err.response?.data || err.message);
+      setAlert({ message: "Error occurred while deleting the post", type: "error" });
     }
   };
 
@@ -267,15 +267,15 @@ function PostPage() {
 
       setIsEditModalOpen(false);
       setEditingPost(null);
-      setAlert({ message: "Postimi u përditësua me sukses!", type: "success" });
+      setAlert({ message: "Post updated successfully!", type: "success" });
 
 
     } catch (err) {
       console.error(
-        "Gabim gjatë përditësimit të postimit:",
+        "Error occurred while updating the post:",
         err.response?.data || err.message
       );
-      setAlert({ message: "Gabim gjatë përditësimit të postimit", type: "error" });
+      setAlert({ message: "Error occurred while updating the post", type: "error" });
     }
   };
 
@@ -320,7 +320,7 @@ function PostPage() {
       {/* Modal për konfirmim fshirje */}
       {postIdToDelete !== null && (
         <CustomAlertModal
-          message="A je i/e sigurt që dëshiron të fshish këtë postim?"
+          message="Are you sure!"
           type="confirm"
           onConfirm={() => {
             handleDelete(postIdToDelete);

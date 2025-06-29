@@ -346,6 +346,54 @@ export const postsByCity = async (req, res) => {
 //     res.status(500).json({ message: "Dështoi fshirja e postimit" });
 //   }
 // };
+// export const deletePost = async (req, res) => {
+//   const tokenUserId = req.userId;
+//   const tokenUserRole = req.userRole;
+//   const postId = req.params.id;
+
+//   try {
+//     const post = await prisma.post.findUnique({
+//       where: { id: postId },
+//     });
+
+//     if (!post) {
+//       return res.status(404).json({ message: "Post not found" });
+//     }
+
+//     if (post.userId !== tokenUserId && tokenUserRole !== "ADMIN") {
+//       return res.status(403).json({ message: "Not Authorized!" });
+//     }
+
+//     const details = await prisma.postDetail.findMany({
+//       where: { postId },
+//     });
+
+//     if (details.length > 0) {
+//       await prisma.postDetail.deleteMany({
+//         where: { postId },
+//       });
+//     }
+
+//     await prisma.post.delete({
+//       where: { id: postId },
+//     });
+
+//     // Regjistro audit log për delete post
+//     await prisma.auditLog.create({
+//       data: {
+//         userId: tokenUserId,
+//         action: "DELETE_POST",
+//         targetId: postId,
+//         message: `User ${tokenUserId} deleted post ${postId}`,
+//       },
+//     });
+
+//     res.status(200).json({ message: "Post deleted" });
+//   } catch (err) {
+//     console.log("Error deleting post:", err);
+//     res.status(500).json({ message: "Failed to delete post" });
+//   }
+// };
 export const deletePost = async (req, res) => {
   const tokenUserId = req.userId;
   const tokenUserRole = req.userRole;
@@ -364,21 +412,22 @@ export const deletePost = async (req, res) => {
       return res.status(403).json({ message: "Not Authorized!" });
     }
 
-    const details = await prisma.postDetail.findMany({
+    // 1. Fshi SavedPost lidhjet që lidhen me këtë post
+    await prisma.savedPost.deleteMany({
       where: { postId },
     });
 
-    if (details.length > 0) {
-      await prisma.postDetail.deleteMany({
-        where: { postId },
-      });
-    }
+    // 2. Fshi postDetail nëse ekziston
+    await prisma.postDetail.deleteMany({
+      where: { postId },
+    });
 
+    // 3. Fshi postin
     await prisma.post.delete({
       where: { id: postId },
     });
 
-    // Regjistro audit log për delete post
+    // Regjistro audit log për fshirjen e postit
     await prisma.auditLog.create({
       data: {
         userId: tokenUserId,

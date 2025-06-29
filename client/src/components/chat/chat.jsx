@@ -435,7 +435,7 @@ function Chat({ chats, setChats }) {
             </div>
             {!loading && (
               <span className="close" onClick={handleCloseChat}>
-                &times;
+                {/* &times; */}
               </span>
             )}
             <button

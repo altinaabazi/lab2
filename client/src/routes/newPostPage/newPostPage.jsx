@@ -1,19 +1,26 @@
 
-import { useState } from "react";
+import { useState , useContext, useEffect} from "react";
 import "./newPostPage.scss";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import apiRequest from "../../lib/apiRequest";
 import UploadWidget from "../../components/uploadWidget/UploadWidget";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 function NewPostPage() {
   const [value, setValue] = useState("");
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
   const [loadingImages, setLoadingImages] = useState(false);
-
+ const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
+
+   useEffect(() => {
+    if (!currentUser || currentUser.role !== "ADMIN") {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

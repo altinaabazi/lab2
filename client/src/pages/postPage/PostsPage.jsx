@@ -127,8 +127,8 @@ function EditPostModal({ post, isOpen, onClose, onSave }) {
                       }))
                     }
                   >
-                    <option value="true">Po</option>
-                    <option value="false">Jo</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
                   </select>
                 </label>
               );

@@ -18,7 +18,7 @@ router.post("/register",register);
 router.post("/login",login);
 router.post("/logout",logout);
 router.get("/admin-only", verifyToken, verifyAdmin, (req, res) => {
-    res.status(200).json({ message: "Vetëm admin mund ta shohë këtë!" });
+    res.status(200).json({ message: "Just Admin can see this!" });
   });
 
 

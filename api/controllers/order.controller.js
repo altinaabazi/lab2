@@ -5,9 +5,9 @@ import { getSqlPool, sql } from "../lib/sql.js";
 // Inicjalizo Stripe me çelësin sekret nga .env
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// ===========================
+
 // Krijimi i një porosie të re
-// ===========================
+
 export const createOrder = async (req, res) => {
   const {
     userId,
@@ -96,9 +96,9 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// =====================================
+
 // Përditëso statusin e apartamentit si 'sold' pas suksesit me Stripe
-// =====================================
+
 export const markApartmentAsSold = async (req, res) => {
   const { apartmentId, paymentIntentId } = req.body;
 
@@ -129,19 +129,7 @@ export const markApartmentAsSold = async (req, res) => {
   }
 };
 
-// Merr të gjitha porositë (për admin dashboard ose histori)
-// export const getOrders = async (req, res) => {
-//   try {
-//     const pool = await getSqlPool();
-//     const result = await pool.request()
-//       .query("SELECT * FROM Orders ORDER BY OrderDate DESC");
 
-//     res.status(200).json(result.recordset);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Failed to get orders" });
-//   }
-// };
 
 export const getOrders = async (req, res) => {
     try {

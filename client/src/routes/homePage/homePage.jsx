@@ -1,14 +1,17 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import SearchBar from "../../components/searchBar/SearchBar";
 import "./homePage.scss";
 import { AuthContext } from "../../context/AuthContext";
 import About from "../../pages/about/About";
 import Contact from "../../pages/contact/Contact";
 import Footer from "../../pages/footer/Footer";
-
+//import ArticlesList from "../../components/article/ArticlesList";
 function HomePage() {
   const { currentUser } = useContext(AuthContext);
   console.log(currentUser);
+  // const [showArticles, setShowArticles] = useState(false);
+
+  // const toggleArticles = () => setShowArticles(prev => !prev);
 
   return (
     <div className="homePage">
@@ -46,6 +49,30 @@ function HomePage() {
       <section id="contact" className="contactSection">
         <Contact />
       </section>
+
+       {/* <section className="articlesSection">
+        <div className="toggleArticles" style={{ textAlign: 'center', margin: '5px 0' }}>
+          <span
+            onClick={toggleArticles}
+            style={{
+              display: 'inline-block',
+              marginTop: 1,
+              color: '#007bff',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              fontSize: 14
+            }}
+          >
+            Click for our articles
+          </span>
+        </div>
+
+        {showArticles && (
+          <div className="articlesListContainer">
+            <ArticlesList />
+          </div>
+        )}
+      </section> */}
 
       <footer className="footerSection">
         <Footer />

@@ -75,27 +75,6 @@ export const getPost = async (req, res) => {
   }
 };
 
-// export const addPost = async (req, res) => {
-//   const body = req.body;
-//   const tokenUserId = req.userId;
-
-//   try {
-//     const newPost = await prisma.post.create({
-//       data: {
-//         ...body.postData,
-//         userId: tokenUserId,
-//         postDetail: {
-//           create: body.postDetail,
-//         },
-//       },
-//     });
-
-//     res.status(200).json(newPost);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ message: "Failed to create post" });
-//   }
-// };
 export const addPost = async (req, res) => {
   const body = req.body;
   const tokenUserId = req.userId;
@@ -128,89 +107,7 @@ export const addPost = async (req, res) => {
   }
 };
 
-// export const updatePost = async (req, res) => {
-//   const id = req.params.id;
-//   const tokenUserId = req.userId;
-//   const body = req.body;
 
-//   try {
-//     const post = await prisma.post.findUnique({ where: { id } });
-
-//     if (!post || post.userId !== tokenUserId) {
-//       return res.status(403).json({ message: "Not Authorized!" });
-//     }
-
-//     const updatedPost = await prisma.post.update({
-//       where: { id },
-//       data: {
-//         ...body,
-//       },
-//     });
-
-//     res.status(200).json(updatedPost);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ message: "Failed to update post" });
-//   }
-// };
-
-
-// //e mira
-// export const updatePost = async (req, res) => {
-//   const postId = req.params.id;
-//   console.log("Received postId:", postId);
-
-//   if (!postId) {
-//     return res.status(400).json({ message: "Post ID is missing." });
-//   }
-
-//   try {
-//     const existingPost = await prisma.post.findUnique({
-//       where: { id: postId },
-//       include: { postDetail: true },
-//     });
-
-//     if (!existingPost) {
-//       return res.status(404).json({ message: "Post not found" });
-//     }
-
-//     const updatedPost = await prisma.post.update({
-//       where: { id: postId },
-//       data: {
-//         title: req.body.title,
-//         price: req.body.price,
-//         images: req.body.images,
-//         address: req.body.address,
-//         city: req.body.city,
-//         bedroom: req.body.bedroom,
-//         bathroom: req.body.bathroom,
-//         latitude: req.body.latitude,
-//         longitude: req.body.longitude,
-//         type: req.body.type,
-//         property: req.body.property,
-//         isSold: req.body.isSold, // ← kjo u shtua
-
-//         postDetail: {
-//           update: {
-//             desc: req.body.postDetail.desc,
-//             utilities: req.body.postDetail.utilities,
-//             pet: req.body.postDetail.pet,
-//             income: req.body.postDetail.income,
-//             size: req.body.postDetail.size,
-//             school: req.body.postDetail.school,
-//             bus: req.body.postDetail.bus,
-//             restaurant: req.body.postDetail.restaurant,
-//           },
-//         },
-//       },
-//     });
-
-//     res.status(200).json(updatedPost);
-//   } catch (error) {
-//     console.error("Error updating post:", error);
-//     res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
 export const updatePost = async (req, res) => {
   const postId = req.params.id;
   const tokenUserId = req.userId;
@@ -306,94 +203,6 @@ export const postsByCity = async (req, res) => {
   }
 };
 
-// export const deletePost = async (req, res) => {
-//   console.log("ID e përdoruesit nga tokeni:", req.userId);
-//   console.log("ID e postimit për fshirje:", req.params.id);
-
-//   try {
-//     const post = await prisma.post.findUnique({
-//       where: { id: req.params.id },
-//     });
-
-//     if (!post) {
-//       console.log("Postimi nuk u gjet me ID:", req.params.id);
-//       return res.status(404).json({ message: "Postimi nuk u gjet" });
-//     }
-
-//     if (post.userId !== req.userId && req.userRole !== "ADMIN") {
-//       console.log("Jo e autorizuar për fshirje:", req.userId, req.userRole);
-//       return res.status(403).json({ message: "Not Authorized!" });
-//     }
-
-//     // Kontrollo nëse ka detaje që duhen fshirë para
-//     const details = await prisma.postDetail.findMany({
-//       where: { postId: req.params.id },
-//     });
-//     if (details.length > 0) {
-//       console.log("Fshirja e postDetail për postId:", req.params.id);
-//       await prisma.postDetail.deleteMany({
-//         where: { postId: req.params.id },
-//       });
-//     }
-
-//     await prisma.post.delete({
-//       where: { id: req.params.id },
-//     });
-
-//     res.status(200).json({ message: "Post deleted" });
-//   } catch (err) {
-//     console.log("Gabim gjatë fshirjes së postimit:", err);
-//     res.status(500).json({ message: "Dështoi fshirja e postimit" });
-//   }
-// };
-// export const deletePost = async (req, res) => {
-//   const tokenUserId = req.userId;
-//   const tokenUserRole = req.userRole;
-//   const postId = req.params.id;
-
-//   try {
-//     const post = await prisma.post.findUnique({
-//       where: { id: postId },
-//     });
-
-//     if (!post) {
-//       return res.status(404).json({ message: "Post not found" });
-//     }
-
-//     if (post.userId !== tokenUserId && tokenUserRole !== "ADMIN") {
-//       return res.status(403).json({ message: "Not Authorized!" });
-//     }
-
-//     const details = await prisma.postDetail.findMany({
-//       where: { postId },
-//     });
-
-//     if (details.length > 0) {
-//       await prisma.postDetail.deleteMany({
-//         where: { postId },
-//       });
-//     }
-
-//     await prisma.post.delete({
-//       where: { id: postId },
-//     });
-
-//     // Regjistro audit log për delete post
-//     await prisma.auditLog.create({
-//       data: {
-//         userId: tokenUserId,
-//         action: "DELETE_POST",
-//         targetId: postId,
-//         message: `User ${tokenUserId} deleted post ${postId}`,
-//       },
-//     });
-
-//     res.status(200).json({ message: "Post deleted" });
-//   } catch (err) {
-//     console.log("Error deleting post:", err);
-//     res.status(500).json({ message: "Failed to delete post" });
-//   }
-// };
 export const deletePost = async (req, res) => {
   const tokenUserId = req.userId;
   const tokenUserRole = req.userRole;

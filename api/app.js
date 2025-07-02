@@ -11,6 +11,8 @@ import messageRoute from "./routes/message.route.js";
 import contactRoute from "./routes/contact.route.js";
 import orderRoute from "./routes/order.route.js"; // Importojmë order.route.js
 import auditLogRouter from "./routes/auditLog.route.js"
+import articleRoutes from "./routes/article.route.js"
+import articleCategoryRoutes from './routes/articleCategory.routes.js'
 // Ngarkojmë variablat nga skedari .env
 dotenv.config();
 
@@ -40,6 +42,10 @@ app.use("/api/messages", messageRoute);
 app.use("/api/contact", contactRoute);
 app.use("/api/orders", orderRoute);  // Shtojmë rrugën për porositë
 app.use("/api/audit-logs", auditLogRouter);
+app.use('/api/articles', articleRoutes);
+app.use('/api/article-categories', articleCategoryRoutes);
+
+
 
 // Dëgjojmë për kërkesa në portin 8800
 app.listen(8800, () => {

@@ -137,26 +137,6 @@ function Dashboard() {
     }
   };
 
-  //  useEffect(() => {
-  //   socket.on("connect", () => {
-  //     console.log("✅ Socket connected:", socket.id);
-  //   });
-
-  //   socket.on("disconnect", () => {
-  //     console.log("❌ Socket disconnected");
-  //   });
-
-  //   socket.on("onlineUsers", (users) => {
-  //     console.log("🟢 Online users received:", users);
-  //     setOnlineUsers(users);
-  //   });
-
-  //   return () => {
-  //     socket.off("connect");
-  //     socket.off("disconnect");
-  //     socket.off("onlineUsers");
-  //   };
-  // }, []);
   useEffect(() => {
     socket.on("connect", () => {
       console.log("✅ Socket connected:", socket.id);
@@ -185,72 +165,6 @@ function Dashboard() {
       socket.off("onlineUsers");
     };
   }, []);
-  // useEffect(() => {
-  //     if (!currentUser) return;
-
-  //     const handleConnect = () => {
-  //       console.log("✅ Socket connected:", socket.id);
-  //       socket.emit("newUser", {
-  //         userId: currentUser._id || currentUser.id,
-  //         username: currentUser.username,
-  //       });
-  //     };
-
-  //     socket.on("connect", handleConnect);
-
-  //     socket.on("disconnect", () => {
-  //       console.log("❌ Socket disconnected");
-  //     });
-
-  //     socket.on("onlineUsers", (users) => {
-  //       console.log("🟢 Online users received:", users);
-  //       setOnlineUsers(users);
-  //     });
-
-  //     // Emit nëse socket është veç i lidhur
-  //     if (socket.connected) {
-  //       handleConnect();
-  //     }
-
-  //     return () => {
-  //       socket.off("connect", handleConnect);
-  //       socket.off("disconnect");
-  //       socket.off("onlineUsers");
-  //     };
-  //   }, [currentUser]);
-  // useEffect(() => {
-  //   if (!currentUser) return;
-
-  //   const handleConnect = () => {
-  //     console.log("✅ Socket connected:", socket.id);
-  //     socket.emit("newUser", {
-  //       userId: currentUser._id || currentUser.id,
-  //       username: currentUser.username,
-  //     });
-  //   };
-
-  //   socket.on("connect", handleConnect);
-
-  //   socket.on("disconnect", () => {
-  //     console.log("❌ Socket disconnected");
-  //   });
-
-  //   socket.on("onlineUsers", (users) => {
-  //     console.log("🟢 Online users received:", users);
-  //     setOnlineUsers(users); // kjo vjen nga props ose state
-  //   });
-
-  //   // Nëse socket është veç i lidhur
-  //   if (socket.connected) {
-  //     handleConnect();
-  //   }
-
-  //   return () => {
-  //     socket.off("connect", handleConnect);
-  //     socket.off("disconnect");
-  //     socket.off("onlineUsers");
-  //   };
-  // }, [currentUser]);
 
 
   const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
@@ -260,29 +174,7 @@ function Dashboard() {
       username: user ? user.username : "Unknown",
     };
   });
-  // const onlineUsersWithNames = onlineUsers.map((onlineUser) => {
-  //   const user = users.find(
-  //     (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
-  //   );
-
-  //   return {
-  //     ...onlineUser,
-  //     username: user?.username || "Unknown",
-  //   };
-  // });
-
-  // const onlineUsersWithNames = onlineUsers
-  //   .filter((u) => u.userId) // ❗⛔️ hiq ata që nuk kanë ID
-  //   .map((onlineUser) => {
-  //     const user = users.find(
-  //       (u) => u.id === onlineUser.userId || u._id === onlineUser.userId
-  //     );
-  //     return {
-  //       ...onlineUser,
-  //       username: user?.username || "Unknown",
-  //     };
-  //   });
-
+ 
   const fetchTotalPosts = async () => {
     try {
       const res = await axios.get("http://localhost:8800/api/posts/count", { withCredentials: true });
@@ -625,32 +517,7 @@ function Dashboard() {
         )}
 
 
-        {/* {activeSection === "onlineusers" && (
-  <div className="online-users">
-    <h3>Online Users:</h3>
-
-    {onlineUsersWithNames.length > 0 ? (
-      <table>
-        <thead>
-          <tr>
-            <th>Emri</th>
-            <th>ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          {onlineUsersWithNames.map((user) => (
-            <tr key={user.socketId}>
-              <td>{user.username}</td>
-              <td>{user.userId}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <p>All Offline.</p>
-    )}
-  </div>
-)} */}
+     
         {activeSection === "onlineusers" && (
           <div className="online-users">
             <h3>Online Users:</h3>
@@ -667,7 +534,7 @@ function Dashboard() {
                   {onlineUsersWithNames.map((user) => (
                     <tr key={user.socketId}>
                       <td>
-                        <span className="online-dot"></span> {/* pika jeshile */}
+                        <span className="online-dot"></span> 
                         {user.username}
                       </td>
                       <td>{user.userId}</td>

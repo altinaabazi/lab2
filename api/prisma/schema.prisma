@@ -130,3 +130,19 @@ model AuditLog {
 
   user      User     @relation(fields: [userId], references: [id])
 }
+
+model ArticleCategory {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String    @unique
+  articles Article[]
+}
+
+model Article {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String
+  image       String?         
+  categoryId  String          @db.ObjectId
+  category    ArticleCategory @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+}

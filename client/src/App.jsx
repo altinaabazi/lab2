@@ -16,6 +16,10 @@ import Footer from "./pages/footer/Footer";
 import Contact from "./pages/contact/Contact";
 import Chat from "./components/chat/chat";
 import PostsPage from "./pages/postPage/PostsPage";
+import Categories from "./components/article/Categories";
+import Articles from "./components/article/Articles";
+import ArticlesList from "./components/article/ArticlesList";
+import CategoriesManager from "./components/article/CategoriesList";
 function App() {
   const router = createBrowserRouter([
     {
@@ -59,8 +63,24 @@ function App() {
         {
         path:"/chat/:id",
 
-          element: <Chat />, // Chat component
+          element: <Chat />, 
         },
+      //    {
+      //   path: "/categories",
+      //   element: <Categories />,  
+      // },
+      // {
+      //   path: "/articles",
+      //   element: <Articles />,   
+      // },
+      // {
+      //   path: "/articlesList",
+      //   element: <ArticlesList />,   
+      // },
+      //  {
+      //   path: "/categoriesList",
+      //   element: <CategoriesManager />,   
+      // },
       ],
     },
     {
